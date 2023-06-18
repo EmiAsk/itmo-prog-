@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
+          prefWidth="400.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/19"
+          xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="se.ifmo.lab08.client.controller.FlatCreatingAndUpdatingFormController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="202.0" minWidth="10.0" prefWidth="160.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="253.0" minWidth="10.0" prefWidth="240.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints maxHeight="61.0" minHeight="10.0" prefHeight="61.0" vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <children>
+        <Button fx:id="okButton" mnemonicParsing="false" onAction="#onOkButtonPressed"
+                onMouseEntered="#onButtonMouseEntered" onMouseExited="#onButtonMouseExited" prefHeight="47.0"
+                prefWidth="97.0"
+                style="-fx-background-color: null; -fx-border-color: brown; -fx-border-radius: 50; -fx-border-width: 1;"
+                text="Ok" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="11">
+            <font>
+                <Font size="20.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets left="80.0"/>
+            </GridPane.margin>
+        </Button>
+        <Button fx:id="cancelButton" minHeight="47.0" minWidth="97.0" mnemonicParsing="false"
+                onAction="#onCloseButtonPressed" onMouseEntered="#onButtonMouseEntered"
+                onMouseExited="#onButtonMouseExited" prefHeight="47.0"
+                style="-fx-background-color: null; -fx-border-color: brown; -fx-border-radius: 50; -fx-border-width: 1;"
+                text="Cancel" wrapText="true" GridPane.halignment="CENTER" GridPane.rowIndex="11">
+            <font>
+                <Font size="20.0"/>
+            </font>
+        </Button>
+        <Label fx:id="bandNameLabel" text="Flat name" GridPane.halignment="RIGHT" GridPane.rowIndex="0">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="coordinateXLabel" text="Coordinate X" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="coordinateYLabel" text="Coordinate Y" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="areaLabel" text="Area" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="numberOfRoomsLabel" text="Number of rooms" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="furnishLabel" text="Furnish" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="viewLabel" text="View" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="transportLabel" text="Transport" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="houseNameLabel" text="House name" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="houseYearLabel" text="House year" GridPane.halignment="RIGHT" GridPane.rowIndex="9">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="houseNumberOfFlatsLabel" text="House humber of flats" GridPane.halignment="RIGHT"
+               GridPane.rowIndex="10">
+            <font>
+                <Font size="15.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0"/>
+            </GridPane.margin>
+        </Label>
+        <TextField fx:id="bandNameTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0"
+                   promptText="flat name"
+                   style="-fx-border-radius: 100; -fx-background-radius: 100; -fx-border-color: null;"
+                   GridPane.columnIndex="1" GridPane.halignment="LEFT">
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="coordinateXTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0"
+                   promptText="coordinate x" style="-fx-border-radius: 100; -fx-background-radius: 100;"
+                   GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="coordinateYTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0"
+                   promptText="coordinate y" style="-fx-border-radius: 100; -fx-background-radius: 100;"
+                   GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="areaTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0" promptText="area"
+                   style="-fx-border-radius: 100; -fx-background-radius: 100;" GridPane.columnIndex="1"
+                   GridPane.rowIndex="3">
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="numberOfRoomsTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0"
+                   promptText="number of rooms" style="-fx-border-radius: 100; -fx-background-radius: 100;"
+                   GridPane.columnIndex="1" GridPane.rowIndex="4">
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+        <ComboBox fx:id="furnishComboBox" blendMode="DARKEN" prefWidth="200.0" promptText="select furnish"
+                  style="-fx-border-radius: 100; -fx-background-radius: 100;" GridPane.columnIndex="1"
+                  GridPane.rowIndex="5">
+            <opaqueInsets>
+                <Insets left="10.0"/>
+            </opaqueInsets>
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </ComboBox>
+        <ComboBox fx:id="viewComboBox" blendMode="DARKEN" prefWidth="200.0" promptText="select view"
+                  style="-fx-border-radius: 100; -fx-background-radius: 100;" GridPane.columnIndex="1"
+                  GridPane.rowIndex="6">
+            <opaqueInsets>
+                <Insets left="10.0"/>
+            </opaqueInsets>
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </ComboBox>
+        <ComboBox fx:id="transportComboBox" blendMode="DARKEN" prefWidth="200.0" promptText="select transport"
+                  style="-fx-border-radius: 100; -fx-background-radius: 100;" GridPane.columnIndex="1"
+                  GridPane.rowIndex="7">
+            <opaqueInsets>
+                <Insets left="10.0"/>
+            </opaqueInsets>
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </ComboBox>
+        <TextField fx:id="houseNameTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0"
+                   promptText="house name" style="-fx-border-radius: 100; -fx-background-radius: 100;"
+                   GridPane.columnIndex="1" GridPane.rowIndex="8">
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="houseYearTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0"
+                   promptText="house year" style="-fx-border-radius: 100; -fx-background-radius: 100;"
+                   GridPane.columnIndex="1" GridPane.rowIndex="9">
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+        <TextField fx:id="houseNumberOfFlatsTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0"
+                   promptText="house number of flats on floor"
+                   style="-fx-border-radius: 100; -fx-background-radius: 100;" GridPane.columnIndex="1"
+                   GridPane.rowIndex="10">
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+    </children>
+</GridPane>

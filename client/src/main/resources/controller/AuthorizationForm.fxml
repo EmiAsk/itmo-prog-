@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
+          prefWidth="800.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/19"
+          xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="se.ifmo.lab08.client.controller.AuthorizationFormController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="295.0" prefWidth="295.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="505.0" prefWidth="505.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <children>
+        <Label fx:id="loginLabel" text="Login" GridPane.halignment="RIGHT" GridPane.rowIndex="1"
+               GridPane.valignment="CENTER">
+            <font>
+                <Font size="24.0"/>
+            </font>
+        </Label>
+        <Label fx:id="passwordLabel" text="Password" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+            <font>
+                <Font size="24.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="logInTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                   minWidth="-Infinity" prefHeight="45.0" prefWidth="203.0" promptText="Enter login here"
+                   style="-fx-background-radius: 100;" GridPane.columnIndex="1" GridPane.halignment="LEFT"
+                   GridPane.rowIndex="1">
+            <font>
+                <Font size="24.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </TextField>
+        <PasswordField fx:id="passwordTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                       minWidth="-Infinity" onMouseEntered="#onPasswordFieldMouseEntered"
+                       onMouseExited="#onPasswordFieldMouseExited" prefHeight="45.0" prefWidth="203.0"
+                       promptText="Enter pass here" style="-fx-background-radius: 100;" GridPane.columnIndex="1"
+                       GridPane.rowIndex="2">
+            <font>
+                <Font size="20.0"/>
+            </font>
+            <GridPane.margin>
+                <Insets left="10.0"/>
+            </GridPane.margin>
+        </PasswordField>
+        <MenuBar GridPane.columnSpan="2" GridPane.valignment="TOP">
+            <menus>
+                <Menu fx:id="settingsMenu" mnemonicParsing="false" text="Settings">
+                    <items>
+                        <MenuItem fx:id="languageMenuItem" mnemonicParsing="false" onAction="#onLanguageMenuItemPressed"
+                                  text="Language"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <GridPane GridPane.columnSpan="2" GridPane.rowIndex="3">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="400.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="400.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <Button fx:id="signUpButton" minHeight="50.0" minWidth="110.0" mnemonicParsing="false"
+                        onAction="#onSignUpButtonPressed" onMouseEntered="#onButtonMouseEntered"
+                        onMouseExited="#onButtonMouseExited"
+                        style="-fx-background-color: null; -fx-border-color: brown; -fx-border-radius: 50; -fx-border-width: 1;"
+                        text="Sign Up" wrapText="true" GridPane.halignment="CENTER" GridPane.valignment="TOP">
+                    <font>
+                        <Font size="20.0"/>
+                    </font>
+                    <GridPane.margin>
+                        <Insets top="10.0"/>
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="signInButton" minHeight="50.0" minWidth="110.0" mnemonicParsing="false"
+                        onAction="#onSignInButtonPressed" onMouseEntered="#onButtonMouseEntered"
+                        onMouseExited="#onButtonMouseExited"
+                        style="-fx-background-color: null; -fx-border-color: brown; -fx-border-radius: 50; -fx-border-width: 1;"
+                        text="Sign In" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="TOP">
+                    <font>
+                        <Font size="20.0"/>
+                    </font>
+                    <GridPane.margin>
+                        <Insets top="10.0"/>
+                    </GridPane.margin>
+                </Button>
+            </children>
+        </GridPane>
+    </children>
+</GridPane>

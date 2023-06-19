@@ -10,9 +10,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import se.ifmo.lab08.common.entity.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class FlatCreatingAndUpdatingFormController {
     @FXML
     private TextField bandNameTextField;
@@ -43,7 +40,7 @@ public class FlatCreatingAndUpdatingFormController {
     private TextField houseNameTextField;
     private boolean isHouseNameValidity;
     @FXML
-    private TextField houseYearTextField;
+    public TextField houseYearTextField;
     private boolean isHouseYearValidity;
     @FXML
     private TextField houseNumberOfFlatsTextField;

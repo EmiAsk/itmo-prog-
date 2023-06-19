@@ -2,8 +2,8 @@ package se.ifmo.lab08.client.tableHandlers;
 
 import javafx.scene.control.TableColumn;
 
-public class FixedNameTableColumn<S, T> extends TableColumn {
-    private ColumnNames fixedName;
+public class FixedNameTableColumn<S, T> extends TableColumn<S, T> {
+    private final ColumnNames fixedName;
 
     public FixedNameTableColumn(ColumnNames columnFixedName) {
         super(columnFixedName.toString());

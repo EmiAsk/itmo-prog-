@@ -46,7 +46,7 @@ public class MainFormController {
     private HBox filtersHBox;
 
     @FXML
-    private TableView tableView;
+    private TableView<Flat> tableView;
 
     private volatile static ObservableList<Flat> modelsCollection = FXCollections.observableArrayList();
 
@@ -69,22 +69,22 @@ public class MainFormController {
     protected Button updateButton;
 
     @FXML
-    protected Button removeButton;
-
-    @FXML
     protected Button removeByIdButton;
 
     @FXML
     protected Button clearButton;
 
     @FXML
-    protected Button filterLessThanFrontManButton;
+    protected Button filterNameButton;
 
     @FXML
-    protected Button countGreaterThanFrontManButton;
+    protected Button printUniqueHouseButton;
 
     @FXML
-    protected Button groupCountingByCoordinatesButton;
+    protected Button removeByFurnishButton;
+
+    @FXML
+    protected Button removeLastButton;
 
     @FXML
     protected Label controllersLabel;
@@ -116,7 +116,6 @@ public class MainFormController {
     private final int LANGUAGE_CHANGING_FORM_WIDTH = 300;
 
     private final int LANGUAGE_CHANGING_FORM_HEIGHT = 200;
-
 
     private volatile TableViewHandler tableViewHandler;
 
@@ -203,20 +202,8 @@ public class MainFormController {
     }
 
     @FXML
-    protected void onRemoveByIdButtonPressed(ActionEvent actionEvent) {
-//        Button button = (Button) actionEvent.getSource();
-//        try {
-//            button.setDisable(true);
-//            AdditionalFormOfDataCollectionController additionalFormOfDataCollectionController = initAdditionalForm();
-//            String value = additionalFormOfDataCollectionController.getResult();
-//            prepareAndInvokeRemoveByIdCommand(value);
-//        } catch (IOException exception) {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setContentText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
-//            alert.show();
-//        } finally {
-//            button.setDisable(false);
-//        }
+    protected void onRemoveLastButtonPressed(ActionEvent actionEvent) {
+
     }
 
     @FXML
@@ -248,6 +235,21 @@ public class MainFormController {
 
     @FXML
     protected void onFilterCreatingButtonPressed(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/FilterCreatorForm.fxml"));
+            Parent node = fxmlLoader.load();
+            FilterCreatorFormController controller = fxmlLoader.getController();
+            Scene scene = new Scene(node, FILTER_CREATING_FROM_WIDTH, FILTER_CREATING_FORM_HEIGHT);
+            Stage stage = new Stage();
+            stage.setResizable(false);
+            controller.setCurrentStage(stage);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException exception) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Can not init component");
+            alert.show();
+        }
 //        try {
 //            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FilterCreatorForm.fxml"));
 //            Parent node = fxmlLoader.load();
@@ -271,7 +273,7 @@ public class MainFormController {
     }
 
     @FXML
-    protected void onFilterLessThanFrontManButtonPressed(ActionEvent actionEvent) {
+    protected void onFilterNameButtonPressed(ActionEvent actionEvent) {
 //        Button button = (Button) actionEvent.getSource();
 //        try {
 //            button.setDisable(true);
@@ -294,7 +296,7 @@ public class MainFormController {
     }
 
     @FXML
-    protected void onRemoveButtonPressed(ActionEvent actionEvent) {
+    protected void onRemoveByIdButtonPressed(ActionEvent actionEvent) {
         Button button = (Button) actionEvent.getSource();
         try {
             button.setDisable(true);
@@ -329,7 +331,7 @@ public class MainFormController {
     }
 
     @FXML
-    protected void onCountGreaterThanFrontManButtonPressed(ActionEvent actionEvent) {
+    protected void onPrintUniqueHouseButtonPressed(ActionEvent actionEvent) {
 //        Button button = (Button) actionEvent.getSource();
 //        try {
 //            button.setDisable(true);
@@ -356,33 +358,50 @@ public class MainFormController {
 //        }
     }
 
-    @FXML
-    protected void onAddIfMinButtonPressed(ActionEvent actionEvent) {
-        Button button = (Button) actionEvent.getSource();
-        try {
-            button.setDisable(true);
-            FlatCreatingAndUpdatingFormController flatCreatingAndUpdatingFormController = initCreatingForm();
-            Flat flat = flatCreatingAndUpdatingFormController.getFlat();
-            if (flat == null) return;
-            commandManager.executeServerCommand("add_if_min", new String[]{}, flat);
-        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Error: " + e);
-            alert.show();
-            throw new RuntimeException(e);
-        } finally {
-            button.setDisable(false);
-        }
-    }
+//    @FXML
+//    protected void onAddIfMinButtonPressed(ActionEvent actionEvent) {
+//        Button button = (Button) actionEvent.getSource();
+//        try {
+//            button.setDisable(true);
+//            FlatCreatingAndUpdatingFormController flatCreatingAndUpdatingFormController = initCreatingForm();
+//            Flat flat = flatCreatingAndUpdatingFormController.getFlat();
+//            if (flat == null) return;
+//            commandManager.executeServerCommand("add_if_min", new String[]{}, flat);
+//        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
+//            Alert alert = new Alert(Alert.AlertType.ERROR);
+//            alert.setContentText("Error: " + e);
+//            alert.show();
+//            throw new RuntimeException(e);
+//        } finally {
+//            button.setDisable(false);
+//        }
+//    }
 
     @FXML
-    protected void onGroupCountingByCoordinatesButtonPressed(ActionEvent actionEvent) {
+    protected void onRemoveByFurnishButtonPressed(ActionEvent actionEvent) {
 //        Command command = new GroupCountingByCoordinatesCommand(MainFormController.getMainFormController().getTableViewHandler().getSortedList().toArray(Flat[]::new));
 //        Invoker.getInstance().invokeCommand(command);
     }
 
     @FXML
     protected void onVisualizationButtonPressed(ActionEvent actionEvent) {
+        Button button = (Button) actionEvent.getSource();
+        Stage stage = App.getPrimaryStage();
+        try {
+            button.setDisable(true);
+            FXMLLoader fxmlLoader = new FXMLLoader(VisualizerFormController.class.getResource("/controller/VisualizerForm.fxml"));
+            Parent parent = fxmlLoader.load();
+            Scene scene = new Scene(parent, VISUALIZATION_FORM_WIDTH, VISUALIZATION_FORM_HEIGHT);
+            stage.setResizable(false);
+            stage.setScene(scene);
+        } catch (IOException exception) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Can not init component");
+//            alert.setContentText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
+            alert.show();
+        } finally {
+            button.setDisable(false);
+        }
 //        Button button = (Button) actionEvent.getSource();
 //        Stage stage = MainApplication.getPrimaryStage();
 //        try {
@@ -426,7 +445,7 @@ public class MainFormController {
     }
 
     private AdditionalFormOfDataCollectionController initAdditionalForm() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("AdditionalFormOfDataCollection.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/AdditionalFormOfDataCollection.fxml"));
         Parent node = fxmlLoader.load();
         AdditionalFormOfDataCollectionController additionalFormOfDataCollectionController = fxmlLoader.getController();
         Scene scene = new Scene(node, ADDITIONAL_FORM_WIDTH, ADDITIONAL_FORM_HEIGHT);
@@ -473,8 +492,8 @@ public class MainFormController {
                 return;
             }
             if (!checkModelUserId(flat)) return;
-            FlatCreatingAndUpdatingFormController controller = initCreatingForm();
-            controller.fillIn(flat);
+            FlatCreatingAndUpdatingFormController controller = initUpdatingForm(flat);
+
             Flat updatedFlat = controller.getFlat();
             if (updatedFlat == null) return;
             commandManager.executeServerCommand("update", new String[]{String.valueOf(flat.getId())}, updatedFlat);
@@ -548,8 +567,21 @@ public class MainFormController {
         return musicBandCreatingAndUpdatingFormController;
     }
 
+    private FlatCreatingAndUpdatingFormController initUpdatingForm(Flat flat) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(FlatCreatingAndUpdatingFormController.class.getResource("/controller/MusicBandCreatingForm.fxml"));
+        Parent node = fxmlLoader.load();
+        Scene scene = new Scene(node, MUSIC_BAND_CREATING_AND_UPDATING_FORM_WIDTH, MUSIC_BAND_CREATING_AND_UPDATING_FORM_HEIGHT);
+        Stage stage = new Stage();
+        FlatCreatingAndUpdatingFormController controller = fxmlLoader.getController();
+        controller.setCurrentStage(stage);
+        controller.fillIn(flat);
+        stage.setScene(scene);
+        stage.showAndWait();
+        return controller;
+    }
+
     private boolean checkModelUserId(Flat flat) {
-        if (Client.getInstance().credentials().getUsername().equals(flat.getOwner().getUsername())) {
+        if (!Client.getInstance().credentials().getUsername().equals(flat.getOwner().getUsername())) {
             provider.getPrinter().print("You can't modify flat you don't own");
             return false;
         }
@@ -569,7 +601,7 @@ public class MainFormController {
         return filtersHBox;
     }
 
-    public TableView getTableView() {
+    public TableView<Flat> getTableView() {
         return tableView;
     }
 
@@ -593,9 +625,9 @@ public class MainFormController {
 //        currentLocale.set(availableLocales);
 //    }
 
-//    public ObservableList<Flat> getModelsCollection() {
-//        return modelsCollection;
-//    }
+    public ObservableList<Flat> getModelsCollection() {
+        return modelsCollection;
+    }
 
     public void setPrimaryScene(Scene scene) {
         this.primaryScene = scene;

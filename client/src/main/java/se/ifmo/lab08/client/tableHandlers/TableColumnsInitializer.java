@@ -31,7 +31,7 @@ public class TableColumnsInitializer {
 //        creationDateColumn.setCellValueFactory(cellValue -> new SimpleObjectProperty<>(cellValue.getValue().getCreatedAt().withZoneSameInstant(MainFormController.getCurrentLocale().get().getZoneID()).format(MainFormController.getCurrentLocale().get().getDateTimeFormatter())));
         creationDateColumn.setCellValueFactory(cellValue -> new SimpleObjectProperty<>(cellValue.getValue().getCreatedAt().toString()));
         TableColumn<Flat, Long> areaColumn = new FixedNameTableColumn<>(ColumnNames.AREA_COLUMN);
-        areaColumn.setCellValueFactory(new PropertyValueFactory("area"));
+        areaColumn.setCellValueFactory(new PropertyValueFactory<>("area"));
         TableColumn<Flat, Long> numberOfRoomsColumn = new FixedNameTableColumn<>(ColumnNames.NUMBER_OF_ROOMS);
         numberOfRoomsColumn.setCellValueFactory(new PropertyValueFactory<>("numberOfRooms"));
         TableColumn<Flat, String> furnishColumn = new FixedNameTableColumn<>(ColumnNames.FURNISH_COLUMN);

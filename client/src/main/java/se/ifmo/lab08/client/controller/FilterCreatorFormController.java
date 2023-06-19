@@ -2,19 +2,33 @@ package se.ifmo.lab08.client.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import se.ifmo.lab08.client.tableHandlers.ColumnNames;
+import se.ifmo.lab08.client.tableHandlers.FixedNameTableColumn;
+import se.ifmo.lab08.client.tableHandlers.TableViewHandler;
+import se.ifmo.lab08.client.tableHandlers.predicatefactory.AbstractPredicateFactory;
+import se.ifmo.lab08.client.tableHandlers.predicatefactory.FilterSigns;
+import se.ifmo.lab08.client.tableHandlers.predicatefactory.PredicateFactory;
+import se.ifmo.lab08.client.util.NotificationPrinter;
+import se.ifmo.lab08.common.entity.Flat;
+import se.ifmo.lab08.common.util.Printer;
+
+import java.io.IOException;
+import java.util.function.Predicate;
 
 public class FilterCreatorFormController {
     @FXML
     protected GridPane currentPane;
-    //    @FXML
-//    private ComboBox<ColumnNames> columnsForFilteringComboBox;
-//    @FXML
-//    private ComboBox<FilterSigns> signsCombobox;
+    @FXML
+    private ComboBox<ColumnNames> columnsForFilteringComboBox;
+    @FXML
+    private ComboBox<FilterSigns> signsCombobox;
     @FXML
     private TextField filteringValueTextField;
     @FXML
@@ -38,16 +52,18 @@ public class FilterCreatorFormController {
 
     private HBox mainFiltersHBox;
 
-    private TableView tableView;
+    private TableView<Flat> tableView;
+
+    private final Printer printer = new NotificationPrinter();
 
     @FXML
     public void initialize() {
-//        mainFiltersHBox = MainFormController.getMainFormController().getFiltersHBox();
-//        tableView = MainFormController.getMainFormController().getTableView();
+        mainFiltersHBox = MainFormController.getMainFormController().getFiltersHBox();
+        tableView = MainFormController.getMainFormController().getTableView();
 //        updateLocale();
-//        initColumns();
-//        columnsForFilteringComboBox.valueProperty().addListener(change -> columnsForFilteringComboBoxChanged());
-//        initSigns();
+        initColumns();
+        columnsForFilteringComboBox.valueProperty().addListener(change -> columnsForFilteringComboBoxChanged());
+        initSigns();
 //        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
     }
 
@@ -64,18 +80,18 @@ public class FilterCreatorFormController {
     }
 
     private void columnsForFilteringComboBoxChanged() {
-//        ColumnNames selectedColumn = columnsForFilteringComboBox.getValue();
-//        if (selectedColumn == ColumnNames.CREATION_DATE_COLUMN) {
-//            datePicker = new DatePicker();
-//            currentPane.getChildren().remove(filteringValueTextField);
-//            currentPane.add(datePicker, DATE_PICKER_COLUMN, DATE_PICKER_ROW);
-//            return;
-//        }
-//        if (datePicker != null) {
-//            currentPane.getChildren().remove(datePicker);
-//            currentPane.add(filteringValueTextField, 1, 2);
-//            datePicker = null;
-//        }
+        ColumnNames selectedColumn = columnsForFilteringComboBox.getValue();
+        if (selectedColumn == ColumnNames.CREATION_DATE_COLUMN) {
+            datePicker = new DatePicker();
+            currentPane.getChildren().remove(filteringValueTextField);
+            currentPane.add(datePicker, DATE_PICKER_COLUMN, DATE_PICKER_ROW);
+            return;
+        }
+        if (datePicker != null) {
+            currentPane.getChildren().remove(datePicker);
+            currentPane.add(filteringValueTextField, 1, 2);
+            datePicker = null;
+        }
     }
 
     @FXML
@@ -85,75 +101,76 @@ public class FilterCreatorFormController {
 
     @FXML
     protected void onCreateButtonPressed(ActionEvent event) {
-//        try {
-//            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FilterForm.fxml"));
-//            Node node = fxmlLoader.load();
-//            FilterFormController filterFormController = fxmlLoader.getController();
-//            if (isColumnSelected(filterFormController)
-//                    && isSignSelected(filterFormController)
-//                    && initPredicate(filterFormController)
-//            ) {
-//                filterFormController.setFilteringValueLabel(filteringValueTextField.getText());
-//                mainFiltersHBox.getChildren().add(node);
-//                currentStage.close();
-//            }
-//        } catch (IOException e) {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/FilterForm.fxml"));
+            Node node = fxmlLoader.load();
+            FilterFormController filterFormController = fxmlLoader.getController();
+            if (isColumnSelected(filterFormController)
+                    && isSignSelected(filterFormController)
+                    && initPredicate(filterFormController)
+            ) {
+                filterFormController.setFilteringValueLabel(filteringValueTextField.getText());
+                mainFiltersHBox.getChildren().add(node);
+                currentStage.close();
+            }
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
 //            alert.setHeaderText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
-//            alert.setContentText(e.getMessage());
-//            alert.show();
-//        }
+            alert.setHeaderText("Can not init component");
+            alert.setContentText(e.getMessage());
+            alert.show();
+        }
     }
 
     private boolean initPredicate(FilterFormController filterFormController) {
-//
-//        FixedNameTableColumn fixedNameTableColumn = (FixedNameTableColumn) tableView.getColumns().stream()
-//                .filter(x -> ((FixedNameTableColumn) x).getFixedName() == columnsForFilteringComboBox.getValue())
-//                .findAny().get();
-//
-//        if (fixedNameTableColumn.getFixedName() == ColumnNames.CREATION_DATE_COLUMN && datePicker.getValue() != null) {
-//            filteringValueTextField.setText(datePicker.getValue().toString());
-//        }
-//
-//        AbstractPredicateFactory abstractPredicateFactory = new AbstractPredicateFactory();
-//        PredicateFactory predicateFactory = abstractPredicateFactory.createFactory(fixedNameTableColumn.getFixedName());
-//        Predicate<Flat> predicate =
-//                predicateFactory.createPredicate(signsCombobox.getValue(),
-//                        filteringValueTextField.getText());
-//        TableViewHandler.getPredicates().add(predicate);
-//        filterFormController.setPredicate(predicate);
-//        return true;
+
+        FixedNameTableColumn fixedNameTableColumn = (FixedNameTableColumn) tableView.getColumns().stream()
+                .filter(x -> ((FixedNameTableColumn) x).getFixedName() == columnsForFilteringComboBox.getValue())
+                .findAny().get();
+
+        if (fixedNameTableColumn.getFixedName() == ColumnNames.CREATION_DATE_COLUMN && datePicker.getValue() != null) {
+            filteringValueTextField.setText(datePicker.getValue().toString());
+        }
+
+        AbstractPredicateFactory abstractPredicateFactory = new AbstractPredicateFactory();
+        PredicateFactory predicateFactory = abstractPredicateFactory.createFactory(fixedNameTableColumn.getFixedName());
+        Predicate<Flat> predicate =
+                predicateFactory.createPredicate(signsCombobox.getValue(),
+                        filteringValueTextField.getText());
+        TableViewHandler.getPredicates().add(predicate);
+        filterFormController.setPredicate(predicate);
         return true;
     }
 
     private void initColumns() {
-//        ObservableList<FixedNameTableColumn> columns = tableView.getColumns();
-//        for (FixedNameTableColumn tableColumn : columns) {
-//            columnsForFilteringComboBox.getItems().add(tableColumn.getFixedName());
-//        }
+        var columns = tableView.getColumns();
+        for (var tableColumn : columns) {
+            columnsForFilteringComboBox.getItems().add(((FixedNameTableColumn<?, ?>) tableColumn).getFixedName());
+        }
     }
 
     private void initSigns() {
-//        for (FilterSigns filterSigns : FilterSigns.values()) {
-//            signsCombobox.getItems().add(filterSigns);
-//        }
+        for (FilterSigns filterSigns : FilterSigns.values()) {
+            signsCombobox.getItems().add(filterSigns);
+        }
     }
 
     private boolean isColumnSelected(FilterFormController filterFormController) {
-//        if (columnsForFilteringComboBox.getValue() != null) {
-//            filterFormController.setColumnForFilteringLabel(columnsForFilteringComboBox.getValue());
-//            return true;
-//        }
+        if (columnsForFilteringComboBox.getValue() != null) {
+            filterFormController.setColumnForFilteringLabel(columnsForFilteringComboBox.getValue());
+            return true;
+        }
+        printer.print("Column was not selected");
 //        Notifications.create().position(Pos.TOP_CENTER).text(RuntimeOutputs.COLUMN_WAS_NOT_SELECTED.toString()).show();
-//        return false;
         return false;
     }
 
     private boolean isSignSelected(FilterFormController filterFormController) {
-//        if (signsCombobox.getValue() != null) {
-//            filterFormController.setFilterSignLabel(signsCombobox.getValue());
-//            return true;
-//        }
+        if (signsCombobox.getValue() != null) {
+            filterFormController.setFilterSignLabel(signsCombobox.getValue());
+            return true;
+        }
+        printer.print("Sign was not selected");
 //        Notifications.create().position(Pos.TOP_CENTER).text(RuntimeOutputs.SIGN_WAS_NOT_SELECTED.toString()).show();
         return false;
     }

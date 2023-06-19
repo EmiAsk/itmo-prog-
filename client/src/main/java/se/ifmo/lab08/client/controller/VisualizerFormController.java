@@ -9,9 +9,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.transform.Affine;
+import se.ifmo.lab08.client.App;
+import se.ifmo.lab08.common.entity.Flat;
+
+import java.util.List;
 
 public class VisualizerFormController {
     @FXML
@@ -58,7 +63,7 @@ public class VisualizerFormController {
 
     private static final Affine defaultTransform = canvas.getGraphicsContext2D().getTransform();
 
-//    private ArrayList<Flat> collection;
+    private List<Flat> collection;
 
     private final int CIRCLE_POLYGON_POINTS_COUNT = 100;
 
@@ -75,6 +80,8 @@ public class VisualizerFormController {
 
     private final int SECOND = 1000;
 
+    private final static String IMAGE_LOC = "http://icons.iconarchive.com/icons/uiconstock/flat-halloween/128/Halloween-Bat-icon.png";
+
 //    private ArrayList<FlatPolygon> musicBandPolygons;
 
 //    private Flat selectedFlat;
@@ -89,9 +96,10 @@ public class VisualizerFormController {
 //        musicBandPolygons = new ArrayList<>();
 //        MainFormController.getCurrentLocale().addListener(change->updateLocale());
 //        updateLocale();
-//        canvas.setOnMouseClicked(this::onCanvasMouseClicked);
-//        canvas.setOnMouseMoved(this::onCanvasMouseMoved);
-//        canvasPane.getChildren().add(canvas);
+        canvas.setOnMouseClicked(this::onCanvasMouseClicked);
+        canvas.setOnMouseMoved(this::onCanvasMouseMoved);
+        canvasPane.getChildren().add(canvas);
+        canvas.getGraphicsContext2D().drawImage(new Image(IMAGE_LOC), 22, 22);
 //        frameTimer = new Timeline(new KeyFrame(Duration.millis(0)), new KeyFrame(
 //                Duration.millis(SECOND / FRAMES_PER_SECOND),
 //                actionEvent -> {
@@ -137,7 +145,7 @@ public class VisualizerFormController {
 //
 //        double canvasComputedWidth = Arrays.stream(modelsArray).mapToDouble(x ->
 //                x.getCoordinates().getX() + (x.getFrontMan().getHeight() == null ?
-//                        DEFAULT_RADIUS_VALUE* SCALE_COMPUTING_RADIUS_MULTIPLIER :
+//                        DEFAULT_RADIUS_VALUE * SCALE_COMPUTING_RADIUS_MULTIPLIER :
 //                        x.getFrontMan().getHeight() * SCALE_COMPUTING_RADIUS_MULTIPLIER)).max().getAsDouble();
 //
 //        double canvasComputedHeight = Arrays.stream(modelsArray).mapToDouble(x ->
@@ -183,8 +191,8 @@ public class VisualizerFormController {
 //    }
 
     private void clearResources() {
-        canvasPane.getChildren().clear();
-        frameTimer.stop();
+//        canvasPane.getChildren().clear();
+//        frameTimer.stop();
     }
 
 //    private void configureGC(int ownerId) {
@@ -218,9 +226,9 @@ public class VisualizerFormController {
 
     @FXML
     protected void onBackToTableButtonPressed(ActionEvent actionEvent) {
-//        MainApplication.getPrimaryStage().setResizable(true);
-//        MainApplication.getPrimaryStage().setScene(MainFormController.getMainFormController().getPrimaryScene());
-//        clearResources();
+        App.getPrimaryStage().setResizable(true);
+        App.getPrimaryStage().setScene(MainFormController.getMainFormController().getPrimaryScene());
+        clearResources();
     }
 
     @FXML

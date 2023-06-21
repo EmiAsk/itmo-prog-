@@ -1,7 +1,9 @@
 package se.ifmo.lab08.client.manager;
 
-import se.ifmo.lab08.client.parser.FlatParser;
+import se.ifmo.lab08.client.command.*;
+import se.ifmo.lab08.client.network.Client;
 import se.ifmo.lab08.common.dto.CommandDTO;
+import se.ifmo.lab08.common.dto.Role;
 import se.ifmo.lab08.common.dto.StatusCode;
 import se.ifmo.lab08.common.dto.request.CommandRequest;
 import se.ifmo.lab08.common.dto.request.GetInfoRequest;
@@ -13,18 +15,12 @@ import se.ifmo.lab08.common.entity.Flat;
 import se.ifmo.lab08.common.exception.AuthorizationException;
 import se.ifmo.lab08.common.exception.InvalidArgsException;
 import se.ifmo.lab08.common.exception.RoleException;
-import se.ifmo.lab08.client.network.Client;
 import se.ifmo.lab08.common.util.ArgumentValidator;
 import se.ifmo.lab08.common.util.IOProvider;
-import se.ifmo.lab08.client.command.*;
 
 import javax.naming.TimeLimitExceededException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,7 +54,7 @@ public class CommandManager {
         return serverCommands;
     }
 
-    private void loadCommands() throws IOException, TimeLimitExceededException, ClassNotFoundException {
+    private void loadCommands() throws IOException, TimeLimitExceededException {
         serverCommands.clear();
         client.send(new GetInfoRequest());
         var response = (GetInfoResponse) client.getResponse();
@@ -108,5 +104,13 @@ public class CommandManager {
         System.out.println(provider.getPrinter().getClass().getSimpleName());
         client.setCredentials(commandResponse.credentials());
         provider.getPrinter().print(commandResponse.message());
+    }
+
+    public List<String> getCommandNamesByRole(Role role) throws IOException, TimeLimitExceededException {
+        loadCommands();
+        var names = new ArrayList<>(serverCommands.values().stream().map(CommandDTO::name).toList());
+        names.addAll(clientCommands.values().stream().filter(p -> p.getRole().weight() <= role.weight()
+        ).map(Command::getName).toList());
+        return names;
     }
 }

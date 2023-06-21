@@ -3,6 +3,7 @@ package se.ifmo.lab08.server.manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.ifmo.lab08.common.dto.CommandDTO;
+import se.ifmo.lab08.common.dto.Role;
 import se.ifmo.lab08.common.dto.StatusCode;
 import se.ifmo.lab08.common.dto.request.CommandRequest;
 import se.ifmo.lab08.common.dto.request.ValidationRequest;
@@ -55,9 +56,31 @@ public class CommandManager {
         this.provider = provider;
     }
 
-    public List<CommandDTO> getCommandsDTO() {
+    public List<CommandDTO> getCommandsDTO(Role role) {
+        if (role == null) {
+            return commands.entrySet()
+                    .stream()
+                    .filter(c -> c.getValue() instanceof Unauthorized)
+                    .map(c -> new CommandDTO(
+                            c.getKey(),
+                            c.getValue().getDescription(),
+                            c.getValue().getArgumentTypes(),
+                            c.getValue().isRequiresModel())
+                    )
+                    .toList();
+        }
+
         return commands.entrySet()
                 .stream()
+                .filter(c -> {
+                            try {
+                                roleManager.check(c.getKey(), role);
+                                return true;
+                            } catch (RoleException e) {
+                                return false;
+                            }
+                        }
+                )
                 .map(c -> new CommandDTO(
                         c.getKey(),
                         c.getValue().getDescription(),

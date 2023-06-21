@@ -9,19 +9,25 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import se.ifmo.lab08.client.App;
 import se.ifmo.lab08.client.manager.CommandManager;
 import se.ifmo.lab08.client.network.Client;
-import se.ifmo.lab08.client.tableHandlers.TableViewHandler;
+import se.ifmo.lab08.client.tablehandlers.TableViewHandler;
+import se.ifmo.lab08.client.util.BufferPrinter;
 import se.ifmo.lab08.client.util.NotificationPrinter;
-import se.ifmo.lab08.common.dto.request.CollectionRequest;
+import se.ifmo.lab08.common.dto.Role;
+import se.ifmo.lab08.common.dto.request.FlatCollectionRequest;
 import se.ifmo.lab08.common.entity.Flat;
 import se.ifmo.lab08.common.util.IOProvider;
 
 import javax.naming.TimeLimitExceededException;
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class MainFormController {
@@ -62,8 +68,8 @@ public class MainFormController {
     @FXML
     protected Button addButton;
 
-    @FXML
-    protected Button addIfMinButton;
+//    @FXML
+//    protected Button addIfMinButton;
 
     @FXML
     protected Button updateButton;
@@ -74,8 +80,8 @@ public class MainFormController {
     @FXML
     protected Button clearButton;
 
-    @FXML
-    protected Button filterNameButton;
+//    @FXML
+//    protected Button filterNameButton;
 
     @FXML
     protected Button printUniqueHouseButton;
@@ -87,6 +93,9 @@ public class MainFormController {
     protected Button removeLastButton;
 
     @FXML
+    protected Button userButton;
+
+    @FXML
     protected Label controllersLabel;
 
     @FXML
@@ -94,6 +103,9 @@ public class MainFormController {
 
     @FXML
     private Button visualizeButton;
+
+    private Map<String, Button> buttons = new HashMap<>();
+
 
 //    private static SimpleObjectProperty<Available> currentLocale = new SimpleObjectProperty<>(AvailableLocales.ENGLISH);
 
@@ -134,13 +146,23 @@ public class MainFormController {
 //        currentLocale.addListener(change -> updateLocale());
 //        updateLocale();
         try {
-            Client.getInstance().send(new CollectionRequest());
+            Client.getInstance().send(new FlatCollectionRequest());
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText("Unable to load collection");
             alert.show();
             throw new RuntimeException(e);
         }
+        buttons.put("add", addButton);
+        buttons.put("update", updateButton);
+        buttons.put("remove_by_id", removeByIdButton);
+        buttons.put("clear", clearButton);
+        buttons.put("remove_all_by_furnish", removeByFurnishButton);
+        buttons.put("remove_last", removeLastButton);
+        buttons.put("print_unique_house", printUniqueHouseButton);
+        buttons.put("execute_script", executeScriptButton);
+
+        handleRoleChange(Client.getInstance().credentials().getRole());
     }
 
     private void updateLocale() {
@@ -300,7 +322,7 @@ public class MainFormController {
         Button button = (Button) actionEvent.getSource();
         try {
             button.setDisable(true);
-            Flat flat = (Flat) tableView.getSelectionModel().getSelectedItem();
+            Flat flat = tableView.getSelectionModel().getSelectedItem();
             if (flat == null) {
                 provider.getPrinter().print("Model was not selected");
                 return;
@@ -350,6 +372,33 @@ public class MainFormController {
 
     @FXML
     protected void onExecuteScriptButtonPressed(ActionEvent actionEvent) {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showOpenDialog(new Stage());
+            if (file == null || !file.exists()) {
+                return;
+            }
+            var builder = new StringBuilder();
+            var provider = new IOProvider(new Scanner(System.in), new BufferPrinter(builder));
+            var manager = new CommandManager(Client.getInstance(), provider, 0);
+            manager.executeClientCommand("execute_script", new String[]{file.getAbsolutePath()});
+
+            this.provider.getPrinter().print("Execute command executed successfully!");
+
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/TextAreaForm.fxml"));
+            Parent node = fxmlLoader.load();
+            TextAreaForm controller = fxmlLoader.getController();
+            controller.setTextArea(builder.toString());
+            Scene scene = new Scene(node, FILTER_CREATING_FROM_WIDTH, FILTER_CREATING_FORM_HEIGHT);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(e.toString());
+            alert.show();
+            throw new RuntimeException(e);
+        }
 //        FileChooser fileChooser = new FileChooser();
 //        File file = fileChooser.showOpenDialog(new Stage());
 //        if (file != null && file.exists()) {
@@ -399,6 +448,7 @@ public class MainFormController {
             alert.setContentText("Can not init component");
 //            alert.setContentText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
             alert.show();
+            throw new RuntimeException(exception);
         } finally {
             button.setDisable(false);
         }
@@ -444,6 +494,30 @@ public class MainFormController {
 //        }
     }
 
+    public void handleRoleChange(Role role) {
+        try {
+            var names = commandManager.getCommandNamesByRole(role);
+            userButton.setDisable(false);
+            userButton.setVisible(true);
+            for (var button : buttons.values()) {
+                button.setDisable(false);
+                button.setVisible(true);
+            }
+            if (role != Role.ADMIN) {
+                userButton.setDisable(true);
+                userButton.setVisible(false);
+            }
+            for (var name : names) {
+                if (buttons.containsKey(name)) {
+                    buttons.get(name).setDisable(true);
+                    buttons.get(name).setVisible(false);
+                }
+            }
+        } catch (IOException | TimeLimitExceededException e) {
+            provider.getPrinter().print("Failed to load commands by role");
+        }
+    }
+
     private AdditionalFormOfDataCollectionController initAdditionalForm() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/AdditionalFormOfDataCollection.fxml"));
         Parent node = fxmlLoader.load();
@@ -486,7 +560,7 @@ public class MainFormController {
     protected void onUpdateButtonPressed(ActionEvent actionEvent) {
         Button button = (Button) actionEvent.getSource();
         try {
-            Flat flat = (Flat) tableView.getSelectionModel().getSelectedItem();
+            Flat flat = tableView.getSelectionModel().getSelectedItem();
             if (flat == null) {
                 provider.getPrinter().print("Model was not selected in table");
                 return;
@@ -552,6 +626,27 @@ public class MainFormController {
     protected void onInfoMenuItemPressed(ActionEvent actionEvent) {
 //        Command command = new InfoCommand(modelsCollection);
 //        Invoker.getInstance().invokeCommand(command);
+    }
+
+    @FXML
+    protected void onUserButtonPressed(ActionEvent actionEvent) {
+        Button button = (Button) actionEvent.getSource();
+        Stage stage = App.getPrimaryStage();
+        try {
+            button.setDisable(true);
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/UserForm.fxml"));
+            Parent parent = fxmlLoader.load();
+            Scene scene = new Scene(parent);
+            stage.setScene(scene);
+        } catch (IOException exception) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Can not init component");
+//            alert.setContentText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
+            alert.show();
+            throw new RuntimeException(exception);
+        } finally {
+            button.setDisable(false);
+        }
     }
 
 

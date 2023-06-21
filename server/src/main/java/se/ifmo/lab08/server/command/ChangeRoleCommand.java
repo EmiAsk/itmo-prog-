@@ -6,9 +6,8 @@ import se.ifmo.lab08.common.dto.request.CommandRequest;
 import se.ifmo.lab08.common.dto.request.Request;
 import se.ifmo.lab08.common.dto.response.CommandResponse;
 import se.ifmo.lab08.common.dto.response.Response;
+import se.ifmo.lab08.common.dto.response.UpdateUserResponse;
 import se.ifmo.lab08.common.exception.InvalidArgsException;
-import se.ifmo.lab08.server.manager.CollectionManager;
-import se.ifmo.lab08.common.util.IOProvider;
 import se.ifmo.lab08.server.manager.CommandManager;
 
 import java.sql.SQLException;
@@ -36,7 +35,9 @@ public class ChangeRoleCommand extends Command {
 
         var user = userRepository.findById(id).orElseThrow(() -> new InvalidArgsException("User not found"));
         user.setRole(role);
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        invoker.getServer().broadcastResponse(new UpdateUserResponse(user));
 
         return new CommandResponse("User role has been changed", StatusCode.OK, request.credentials());
     }

@@ -5,11 +5,12 @@ import org.slf4j.LoggerFactory;
 import se.ifmo.lab08.common.dto.Credentials;
 import se.ifmo.lab08.common.entity.User;
 import se.ifmo.lab08.common.exception.AuthorizationException;
-import se.ifmo.lab08.server.persistance.repository.UserRepository;
 import se.ifmo.lab08.common.util.SecurityManager;
+import se.ifmo.lab08.server.persistance.repository.UserRepository;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 public class AuthManager {
@@ -17,6 +18,15 @@ public class AuthManager {
     private static final Logger logger = LoggerFactory.getLogger(AuthManager.class);
 
     private final UserRepository userRepository = new UserRepository();
+
+    public List<User> getAllUsers() {
+        try {
+            return userRepository.findAll();
+        } catch (SQLException e) {
+            logger.error(e.toString());
+            throw new RuntimeException("Something went wrong while getting all users");
+        }
+    }
 
     public User register(String username, String password) {
         var salt = UUID.randomUUID().toString();

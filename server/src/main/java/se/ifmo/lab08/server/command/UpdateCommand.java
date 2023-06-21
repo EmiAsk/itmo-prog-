@@ -5,6 +5,7 @@ import se.ifmo.lab08.common.dto.request.CommandRequest;
 import se.ifmo.lab08.common.dto.request.Request;
 import se.ifmo.lab08.common.dto.response.CommandResponse;
 import se.ifmo.lab08.common.dto.response.Response;
+import se.ifmo.lab08.common.dto.response.UpdateModelResponse;
 import se.ifmo.lab08.common.exception.InvalidArgsException;
 import se.ifmo.lab08.server.manager.CommandManager;
 
@@ -46,6 +47,7 @@ public class UpdateCommand extends Command {
         flat = flatRepository.save(flat);
 
         invoker.getCollection().update(flatId, flat);
+        invoker.getServer().broadcastResponse(new UpdateModelResponse(flat));
 
         return new CommandResponse("Flat (ID %s) updated successfully.".formatted(flatId), StatusCode.OK, request.credentials());
     }

@@ -2,6 +2,8 @@ package se.ifmo.lab08.client.network;
 
 import se.ifmo.lab08.client.Configuration;
 import se.ifmo.lab08.client.controller.MainFormController;
+import se.ifmo.lab08.client.controller.UserFormController;
+import se.ifmo.lab08.client.controller.VisualizerFormController;
 import se.ifmo.lab08.common.dto.Credentials;
 import se.ifmo.lab08.common.dto.request.Request;
 import se.ifmo.lab08.common.dto.response.*;
@@ -62,7 +64,7 @@ public class Client implements AutoCloseable {
         return credentials != null;
     }
 
-    public void send(byte[] data) throws IOException {
+    public synchronized void send(byte[] data) throws IOException {
         int n = (int) Math.ceil((double) data.length / (BATCH - 1));
         for (int i = 0; i < n; i++) {
             byte[] batch = new byte[BATCH];
@@ -72,7 +74,7 @@ public class Client implements AutoCloseable {
         }
     }
 
-    public void send(Request request) throws IOException {
+    public synchronized void send(Request request) throws IOException {
         request.setCredentials(credentials);
         var byteStream = new ByteArrayOutputStream();
         var objectStream = new ObjectOutputStream(byteStream);
@@ -127,10 +129,13 @@ public class Client implements AutoCloseable {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 var response = receiveResponse();
+                System.out.println(response.getClass().getSimpleName());
                 if (response instanceof BroadcastResponse<?> r) {
-                    handleBroadcastResponse(r);
-                } else if (response instanceof CollectionResponse r) {
-                    handleCollectionResponse(r);
+                    if (isAuthorized()) handleBroadcastResponse(r);
+                } else if (response instanceof FlatCollectionResponse r) {
+                    if (isAuthorized()) handleFlatCollectionResponse(r);
+                } else if (response instanceof UserCollectionResponse r) {
+                    if (isAuthorized()) handleUserCollectionResponse(r);
                 } else {
                     responses.put(response);
                 }
@@ -140,18 +145,32 @@ public class Client implements AutoCloseable {
         }
     }
 
-    private void handleCollectionResponse(CollectionResponse response) {
+    private void handleFlatCollectionResponse(FlatCollectionResponse response) {
         MainFormController.updateCollectionList(response.flats());
+    }
+
+    private void handleUserCollectionResponse(UserCollectionResponse response) {
+        UserFormController.updateUserCollection(response.users());
     }
 
     private void handleBroadcastResponse(BroadcastResponse<?> response) {
         var table = MainFormController.getMainFormController().getTableViewHandler();
         if (response instanceof AddModelResponse addResponse) {
             table.addElement(addResponse.getData());
+            VisualizerFormController.addSprite(addResponse.getData());
         } else if (response instanceof UpdateModelResponse updateResponse) {
             table.updateElement(updateResponse.getData());
+            VisualizerFormController.updateSprite(updateResponse.getData());
         } else if (response instanceof RemoveModelResponse removeResponse) {
             table.removeElement(removeResponse.getData());
+            removeResponse.getData().forEach(VisualizerFormController::removeSprite);
+        } else if (response instanceof AddUserResponse userResponse) {
+            UserFormController.addUser(userResponse.getData());
+        } else if (response instanceof UpdateUserResponse userResponse) {
+            UserFormController.updateUser(userResponse.getData());
+            if (userResponse.getData().getUsername().equals(credentials.getUsername())) {
+                MainFormController.getMainFormController().handleRoleChange(userResponse.getData().getRole());
+            }
         }
     }
 

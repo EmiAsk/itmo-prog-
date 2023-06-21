@@ -9,12 +9,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import se.ifmo.lab08.client.tableHandlers.ColumnNames;
-import se.ifmo.lab08.client.tableHandlers.FixedNameTableColumn;
-import se.ifmo.lab08.client.tableHandlers.TableViewHandler;
-import se.ifmo.lab08.client.tableHandlers.predicatefactory.AbstractPredicateFactory;
-import se.ifmo.lab08.client.tableHandlers.predicatefactory.FilterSigns;
-import se.ifmo.lab08.client.tableHandlers.predicatefactory.PredicateFactory;
+import se.ifmo.lab08.client.tablehandlers.FixedNameTableColumn;
+import se.ifmo.lab08.client.tablehandlers.FlatColumnNames;
+import se.ifmo.lab08.client.tablehandlers.TableViewHandler;
+import se.ifmo.lab08.client.tablehandlers.predicatefactory.AbstractPredicateFactory;
+import se.ifmo.lab08.client.tablehandlers.predicatefactory.FilterSigns;
+import se.ifmo.lab08.client.tablehandlers.predicatefactory.PredicateFactory;
 import se.ifmo.lab08.client.util.NotificationPrinter;
 import se.ifmo.lab08.common.entity.Flat;
 import se.ifmo.lab08.common.util.Printer;
@@ -26,7 +26,7 @@ public class FilterCreatorFormController {
     @FXML
     protected GridPane currentPane;
     @FXML
-    private ComboBox<ColumnNames> columnsForFilteringComboBox;
+    private ComboBox<FlatColumnNames> columnsForFilteringComboBox;
     @FXML
     private ComboBox<FilterSigns> signsCombobox;
     @FXML
@@ -80,8 +80,8 @@ public class FilterCreatorFormController {
     }
 
     private void columnsForFilteringComboBoxChanged() {
-        ColumnNames selectedColumn = columnsForFilteringComboBox.getValue();
-        if (selectedColumn == ColumnNames.CREATION_DATE_COLUMN) {
+        FlatColumnNames selectedColumn = columnsForFilteringComboBox.getValue();
+        if (selectedColumn == FlatColumnNames.CREATION_DATE_COLUMN) {
             datePicker = new DatePicker();
             currentPane.getChildren().remove(filteringValueTextField);
             currentPane.add(datePicker, DATE_PICKER_COLUMN, DATE_PICKER_ROW);
@@ -128,7 +128,7 @@ public class FilterCreatorFormController {
                 .filter(x -> ((FixedNameTableColumn) x).getFixedName() == columnsForFilteringComboBox.getValue())
                 .findAny().get();
 
-        if (fixedNameTableColumn.getFixedName() == ColumnNames.CREATION_DATE_COLUMN && datePicker.getValue() != null) {
+        if (fixedNameTableColumn.getFixedName() == FlatColumnNames.CREATION_DATE_COLUMN && datePicker.getValue() != null) {
             filteringValueTextField.setText(datePicker.getValue().toString());
         }
 

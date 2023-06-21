@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="600.0"
-          prefWidth="800.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/19"
+          prefWidth="800.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/20.0.1"
           xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.ifmo.lab08.client.controller.MainFormController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="661.7692260742188"/>
@@ -79,8 +79,15 @@
                                         onAction="#onFilterRemovingButtonPressed" text="Remove Filters"/>
                             </children>
                         </HBox>
-                        <Button fx:id="visualizeButton" mnemonicParsing="false" onAction="#onVisualizationButtonPressed"
-                                text="Visualize" GridPane.columnIndex="1" GridPane.halignment="RIGHT"/>
+                        <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1"
+                              GridPane.halignment="RIGHT">
+                            <children>
+                                <Button fx:id="userButton" mnemonicParsing="false" onAction="#onUserButtonPressed"
+                                        text="Users"/>
+                                <Button fx:id="visualizeButton" mnemonicParsing="false"
+                                        onAction="#onVisualizationButtonPressed" text="Visualize"/>
+                            </children>
+                        </HBox>
                     </children>
                 </GridPane>
             </children>
@@ -117,18 +124,14 @@
                         prefHeight="26.0" prefWidth="129.0" text="remove by id" textAlignment="CENTER" wrapText="true"/>
                 <Button fx:id="clearButton" mnemonicParsing="false" onAction="#onClearButtonPressed" prefHeight="26.0"
                         prefWidth="129.0" text="clear" textAlignment="CENTER" wrapText="true"/>
-                <Button fx:id="filterNameButton" mnemonicParsing="false"
-                        onAction="#onFilterNameButtonPressed" prefWidth="129.0"
-                        text="filter_name_starts_with" textAlignment="CENTER" wrapText="true"/>
+                <!--                <Button fx:id="filterNameButton" mnemonicParsing="false" onAction="#onFilterNameButtonPressed" prefWidth="129.0" text="filter_name_starts_with" textAlignment="CENTER" wrapText="true" />-->
                 <Button fx:id="printUniqueHouseButton" mnemonicParsing="false"
-                        onAction="#onPrintUniqueHouseButtonPressed" prefWidth="129.0"
-                        text="print_unique_house" textAlignment="CENTER" wrapText="true"/>
-                <Button fx:id="removeByFurnishButton" mnemonicParsing="false"
-                        onAction="#onRemoveByFurnishButtonPressed" prefWidth="129.0"
-                        text="remove_by_furnish" textAlignment="CENTER" wrapText="true"/>
-                <Button fx:id="removeLastButton" mnemonicParsing="false"
-                        onAction="#onRemoveLastButtonPressed" prefWidth="129.0"
-                        text="remove_last" textAlignment="CENTER" wrapText="true"/>
+                        onAction="#onPrintUniqueHouseButtonPressed" prefWidth="129.0" text="print_unique_house"
+                        textAlignment="CENTER" wrapText="true"/>
+                <Button fx:id="removeByFurnishButton" mnemonicParsing="false" onAction="#onRemoveByFurnishButtonPressed"
+                        prefWidth="129.0" text="remove_by_furnish" textAlignment="CENTER" wrapText="true"/>
+                <Button fx:id="removeLastButton" mnemonicParsing="false" onAction="#onRemoveLastButtonPressed"
+                        prefWidth="129.0" text="remove_last" textAlignment="CENTER" wrapText="true"/>
                 <Button fx:id="executeScriptButton" mnemonicParsing="false" onAction="#onExecuteScriptButtonPressed"
                         prefWidth="129.0" text="execute_script" textAlignment="CENTER" wrapText="true"/>
             </children>

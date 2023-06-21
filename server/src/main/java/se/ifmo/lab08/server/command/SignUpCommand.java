@@ -3,6 +3,7 @@ package se.ifmo.lab08.server.command;
 import se.ifmo.lab08.common.dto.Credentials;
 import se.ifmo.lab08.common.dto.StatusCode;
 import se.ifmo.lab08.common.dto.request.CommandRequest;
+import se.ifmo.lab08.common.dto.response.AddUserResponse;
 import se.ifmo.lab08.common.dto.response.CommandResponse;
 import se.ifmo.lab08.common.dto.response.Response;
 import se.ifmo.lab08.common.exception.InvalidArgsException;
@@ -24,6 +25,8 @@ public class SignUpCommand extends Command implements Unauthorized {
         var password = request.args()[1];
         var user = invoker.getAuthManager().register(username, password);
         var credentials = new Credentials(username, password, user.getRole());
+
+        invoker.getServer().broadcastResponse(new AddUserResponse(user));
 
         return new CommandResponse("Signed up successfully", StatusCode.OK, credentials);
     }

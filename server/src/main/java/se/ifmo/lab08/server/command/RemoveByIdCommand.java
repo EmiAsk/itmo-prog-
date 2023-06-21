@@ -4,11 +4,13 @@ import se.ifmo.lab08.common.dto.StatusCode;
 import se.ifmo.lab08.common.dto.request.CommandRequest;
 import se.ifmo.lab08.common.dto.request.Request;
 import se.ifmo.lab08.common.dto.response.CommandResponse;
+import se.ifmo.lab08.common.dto.response.RemoveModelResponse;
 import se.ifmo.lab08.common.dto.response.Response;
 import se.ifmo.lab08.common.exception.InvalidArgsException;
 import se.ifmo.lab08.server.manager.CommandManager;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class RemoveByIdCommand extends Command {
 
@@ -39,6 +41,7 @@ public class RemoveByIdCommand extends Command {
 
         flatRepository.deleteById(flatId);
         invoker.getCollection().removeById(flatId);
+        invoker.getServer().broadcastResponse(new RemoveModelResponse(List.of(flatId)));
 
         return new CommandResponse("Flat (ID %s) removed successfully.\n".formatted(flatId), StatusCode.OK, request.credentials());
     }

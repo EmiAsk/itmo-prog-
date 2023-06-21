@@ -8,9 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import se.ifmo.lab08.client.tableHandlers.ColumnNames;
-import se.ifmo.lab08.client.tableHandlers.TableViewHandler;
-import se.ifmo.lab08.client.tableHandlers.predicatefactory.FilterSigns;
+import se.ifmo.lab08.client.tablehandlers.FlatColumnNames;
+import se.ifmo.lab08.client.tablehandlers.TableViewHandler;
+import se.ifmo.lab08.client.tablehandlers.predicatefactory.FilterSigns;
 import se.ifmo.lab08.common.entity.Flat;
 
 import java.util.function.Predicate;
@@ -25,7 +25,7 @@ public class FilterFormController {
     @FXML
     private Label filteringValueLabel;
 
-    private ColumnNames columnForFiltering;
+    private FlatColumnNames columnForFiltering;
 
     private Predicate<Flat> predicate;
 
@@ -76,7 +76,7 @@ public class FilterFormController {
         TableViewHandler.getPredicates().remove(predicate);
     }
 
-    public void setColumnForFilteringLabel(ColumnNames value) {
+    public void setColumnForFilteringLabel(FlatColumnNames value) {
         columnForFiltering = value;
         columnForFilteringLabel.setText(value.toString());
     }

@@ -1,22 +1,31 @@
 package se.ifmo.lab08.client.controller;
 
+import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
+import javafx.util.Duration;
 import se.ifmo.lab08.client.App;
+import se.ifmo.lab08.client.manager.CommandManager;
+import se.ifmo.lab08.client.network.Client;
+import se.ifmo.lab08.client.util.NotificationPrinter;
+import se.ifmo.lab08.client.vizualization.FlatSprite;
+import se.ifmo.lab08.common.entity.Coordinates;
 import se.ifmo.lab08.common.entity.Flat;
+import se.ifmo.lab08.common.util.IOProvider;
 
+import javax.naming.TimeLimitExceededException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class VisualizerFormController {
     @FXML
@@ -52,7 +61,6 @@ public class VisualizerFormController {
     @FXML
     private Label canvasYLabel;
 
-
     private final float HEIGHT_SLIDER_DEFAULT_VALUE = 1;
 
     private static Canvas canvas = new Canvas();
@@ -72,19 +80,23 @@ public class VisualizerFormController {
 
     private static final int CANVAS_DEFAULT_HEIGHT = 580;
 
-    private static final int DEFAULT_STROKE_WIDTH = 10;
+    private static final int DEFAULT_STROKE_WIDTH = 5;
 
     private final float DEFAULT_RADIUS_VALUE = 100;
 
-    private final double FRAMES_PER_SECOND = 60;
+    private final double FRAMES_PER_SECOND = 31;
 
     private final int SECOND = 1000;
 
-    private final static String IMAGE_LOC = "http://icons.iconarchive.com/icons/uiconstock/flat-halloween/128/Halloween-Bat-icon.png";
+    private static volatile ArrayList<FlatSprite> flatSprites;
 
-//    private ArrayList<FlatPolygon> musicBandPolygons;
+    private Flat selectedFlat;
 
-//    private Flat selectedFlat;
+    private static final Client client = Client.getInstance();
+
+    private IOProvider provider = new IOProvider(new Scanner(System.in), new NotificationPrinter());
+
+    private CommandManager commandManager = new CommandManager(Client.getInstance(), provider, 0);
 
 
     static {
@@ -99,15 +111,19 @@ public class VisualizerFormController {
         canvas.setOnMouseClicked(this::onCanvasMouseClicked);
         canvas.setOnMouseMoved(this::onCanvasMouseMoved);
         canvasPane.getChildren().add(canvas);
-        canvas.getGraphicsContext2D().drawImage(new Image(IMAGE_LOC), 22, 22);
-//        frameTimer = new Timeline(new KeyFrame(Duration.millis(0)), new KeyFrame(
-//                Duration.millis(SECOND / FRAMES_PER_SECOND),
-//                actionEvent -> {
-//                    collection = new ArrayList<>(MainFormController.getMainFormController().getModelsCollection());
-//                    this.drawModels();
-//                }
-//        ));
-//        frameTimer.playFromStart();
+        flatSprites = new ArrayList<>();
+        for (var flat : new ArrayList<>(MainFormController.getMainFormController().getModelsCollection())) {
+            var x = (double) flat.getCoordinates().getX();
+            var y = (double) flat.getCoordinates().getY();
+            var sprite = new FlatSprite(flat, x, y, canvas);
+            flatSprites.add(sprite);
+        }
+        frameTimer = new Timeline(new KeyFrame(Duration.millis(0)), new KeyFrame(
+                Duration.millis(SECOND / FRAMES_PER_SECOND),
+                this::drawModels
+        ));
+        frameTimer.setCycleCount(Timeline.INDEFINITE);
+        frameTimer.play();
     }
 
     private void updateLocale() {
@@ -127,16 +143,15 @@ public class VisualizerFormController {
         canvas.getGraphicsContext2D().setLineWidth(DEFAULT_STROKE_WIDTH);
     }
 
-    private void drawModels() {
-//        if (collection.isEmpty()) return;
-//        canvas.getGraphicsContext2D().setTransform(defaultTransform);
-//        canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-//        computeCanvasScale();
+    private void drawModels(ActionEvent event) {
+        canvas.getGraphicsContext2D().setTransform(defaultTransform);
+        canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        computeCanvasScale();
 //        initPolygons();
 //        musicBandPolygons.sort((o1, o2) -> Float.compare(o1.getRadius(), o2.getRadius()));
-//        for (FlatPolygon polygon : musicBandPolygons) {
-//            drawModel(polygon);
-//        }
+        for (FlatSprite sprite : flatSprites) {
+            drawModel(sprite);
+        }
 //        frameTimer.playFromStart();
     }
 
@@ -171,7 +186,14 @@ public class VisualizerFormController {
 //        }
     }
 
-//    private void drawModel(FlatPolygon polygon) {
+    private void drawModel(FlatSprite sprite) {
+//        canvas.getGraphicsContext2D().setFill(Color.TRANSPARENT);
+        sprite.draw();
+        sprite.refresh();
+
+        var username = sprite.getFlat().getOwner().getUsername();
+        canvas.getGraphicsContext2D().setStroke(username.equals(client.credentials().getUsername()) ? Color.GREEN : Color.RED);
+        canvas.getGraphicsContext2D().strokeRect(sprite.getX(), sprite.getY(), FlatSprite.getWidth(), FlatSprite.getHeight());
 //        PolygonsFacade polygonsFacade = PolygonsFacade.getInstance();
 //        Affine affine = canvas.getGraphicsContext2D().getTransform();
 //        for (FlatPolygon polygonToCompare : musicBandPolygons) {
@@ -188,14 +210,15 @@ public class VisualizerFormController {
 //        Point2D[] points = polygon.getPointsFromPolygon();
 //        graphicsContext.fillPolygon(Arrays.stream(points).mapToDouble(Point2D::getX).toArray(), Arrays.stream(points).mapToDouble(Point2D::getY).toArray(), points.length);
 //        graphicsContext.strokePolygon(Arrays.stream(points).mapToDouble(Point2D::getX).toArray(), Arrays.stream(points).mapToDouble(Point2D::getY).toArray(), points.length);
-//    }
-
-    private void clearResources() {
-//        canvasPane.getChildren().clear();
-//        frameTimer.stop();
     }
 
-//    private void configureGC(int ownerId) {
+    private void clearResources() {
+        frameTimer.stop();
+        flatSprites = null;
+        canvasPane.getChildren().clear();
+    }
+
+    private void configureGC(int ownerId) {
 //        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 //        if (ownerId == ClientInfo.getUserId()) {
 //            graphicsContext.setStroke(Color.GREEN);
@@ -204,24 +227,29 @@ public class VisualizerFormController {
 //            graphicsContext.setStroke(Color.DARKGREY);
 //            graphicsContext.setFill(Color.LIGHTGREY);
 //        }
-//    }
+    }
 
     @FXML
     protected void onCanvasMouseClicked(MouseEvent event) {
-//        Affine affine = canvas.getGraphicsContext2D().getTransform();
-//        double newX = event.getX() / affine.getMxx();
-//        double newY = event.getY() / affine.getMyy();
-//        FlatPolygon musicBandPolygon = null;
-//        for (FlatPolygon polygon : musicBandPolygons) {
-//            if (polygon.contains(newX, newY)) {
-//                musicBandPolygon = polygon;
-//            }
-//        }
-//        if (musicBandPolygon == null) {
-//            resetSelection();
-//            return;
-//        }
-//        selectPolygon(musicBandPolygon);
+        Affine affine = canvas.getGraphicsContext2D().getTransform();
+        double newX = event.getX() / affine.getMxx();
+        double newY = event.getY() / affine.getMyy();
+        FlatSprite flatSprite = null;
+        for (FlatSprite sprite : flatSprites) {
+            if (sprite.contains(newX, newY)) {
+                var currentUsername = client.credentials().getUsername();
+                if (!sprite.getFlat().getOwner().getUsername().equals(currentUsername)) {
+                    provider.getPrinter().print("You can't modify flats you don't own!");
+                    return;
+                }
+                flatSprite = sprite;
+            }
+        }
+        if (flatSprite == null) {
+            resetSelection();
+            return;
+        }
+        selectPolygon(flatSprite);
     }
 
     @FXML
@@ -233,6 +261,23 @@ public class VisualizerFormController {
 
     @FXML
     protected void onOkButtonPressed(ActionEvent actionEvent) {
+        if (selectedFlat == null) {
+            return;
+        }
+        Coordinates coordinates = new Coordinates(Integer.parseInt(coordinateXTextField.getText()), Float.parseFloat(coordinateYTextField.getText()));
+        selectedFlat.setCoordinates(coordinates);
+        new Thread(() -> {
+            try {
+                commandManager.executeServerCommand("update", new String[]{String.valueOf(selectedFlat.getId())}, selectedFlat);
+                resetSelection();
+            } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText(e.toString());
+                alert.show();
+                throw new RuntimeException(e);
+            }
+        }).start();
+
 //        if (FlatFieldsValidators.coordinateXValidate(coordinateXTextField)
 //                & FlatFieldsValidators.coordinateYValidate(coordinateYTextField)
 //                && FlatFieldsValidators.personHeightCheck(String.valueOf(heightSlider.getValue()))
@@ -249,19 +294,53 @@ public class VisualizerFormController {
     }
 
     private void resetSelection() {
-//        coordinateXTextField.setText("");
-//        coordinateYTextField.setText("");
+        coordinateXTextField.setText("");
+        coordinateYTextField.setText("");
 //        heightSlider.setValue(HEIGHT_SLIDER_DEFAULT_VALUE);
-//        selectedFlat = null;
+        selectedFlat = null;
     }
 
-//    private void selectPolygon(FlatPolygon musicBandPolygon) {
-//        coordinateXTextField.setText(String.valueOf(musicBandPolygon.getFlat().getCoordinates().getX()));
-//        coordinateYTextField.setText(String.valueOf(musicBandPolygon.getFlat().getCoordinates().getY()));
-//        Float height = musicBandPolygon.getFlat().getFrontMan().getHeight();
+    private void selectPolygon(FlatSprite sprite) {
+        coordinateXTextField.setText(String.valueOf(sprite.getFlat().getCoordinates().getX()));
+        coordinateYTextField.setText(String.valueOf(sprite.getFlat().getCoordinates().getY()));
+//        Float height = sprite.getFlat().getFrontMan().getHeight();
 //        heightSlider.setValue(height == null ? 100 : height);
-//        selectedFlat = musicBandPolygon.getFlat();
-//    }
+        selectedFlat = sprite.getFlat();
+    }
+
+    public static void removeSprite(long id) {
+        if (flatSprites == null) {
+            return;
+        }
+        flatSprites.removeIf(sprite -> sprite.getFlat().getId() == id);
+    }
+
+    public static void addSprite(Flat flat) {
+        if (flatSprites == null) {
+            return;
+        }
+        var x = (double) flat.getCoordinates().getX();
+        var y = (double) flat.getCoordinates().getY();
+        var sprite = new FlatSprite(flat, x, y, canvas);
+        flatSprites.add(sprite);
+    }
+
+    public static void updateSprite(Flat flat) {
+        if (flatSprites == null) {
+            return;
+        }
+        var x = (double) flat.getCoordinates().getX();
+        var y = (double) flat.getCoordinates().getY();
+        for (var sprite : flatSprites) {
+            if (sprite.getFlat().getId() == flat.getId()) {
+                sprite.setTarget(x, y);
+            }
+        }
+    }
+
+    public static ArrayList<FlatSprite> getFlatSprites() {
+        return flatSprites;
+    }
 
     @FXML
     protected void onButtonMouseEntered(MouseEvent event) {
@@ -292,5 +371,4 @@ public class VisualizerFormController {
         canvasXLabel.setText(newX.toString());
         canvasYLabel.setText(newY.toString());
     }
-
 }

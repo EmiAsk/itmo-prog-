@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -55,15 +56,17 @@ public class Server implements AutoCloseable {
             return commandManager.execute(commandRequest);
         } else if (request instanceof ValidationRequest validationRequest) {
             return commandManager.validate(validationRequest);
-        } else if (request instanceof CollectionRequest) {
-            return new CollectionResponse(new ArrayList<>(commandManager.getCollection().getCollection()));
+        } else if (request instanceof FlatCollectionRequest) {
+            return new FlatCollectionResponse(new ArrayList<>(commandManager.getCollection().getCollection()));
+        } else if (request instanceof UserCollectionRequest) {
+            return new UserCollectionResponse(commandManager.getAuthManager().getAllUsers());
         } else if (request instanceof GetInfoRequest) {
             if (request.credentials() == null) {
-                return new GetInfoResponse(commandManager.getCommandsDTO());
+                return new GetInfoResponse(commandManager.getCommandsDTO(null));
             } else {
                 var role = roleManager.getUserRole(request.credentials().getUsername(), request.credentials().getPassword());
                 request.credentials().setRole(role);
-                return new GetInfoResponse(commandManager.getCommandsDTO(), request.credentials(), StatusCode.OK);
+                return new GetInfoResponse(commandManager.getCommandsDTO(role), request.credentials(), StatusCode.OK);
             }
         } else {
             return new PingResponse();
@@ -74,7 +77,7 @@ public class Server implements AutoCloseable {
         logger.info("BROADCASTING!!!");
         System.out.println(receivingManager.getClientData());
         new Thread(() -> {
-            for (var address : receivingManager.getClientData().keySet()) {
+            for (var address : new HashMap<>(receivingManager.getClientData()).keySet()) {
                 sendingManager.send(address, response);
             }
         }).start();

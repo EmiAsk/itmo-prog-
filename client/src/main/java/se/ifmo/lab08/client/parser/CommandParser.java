@@ -1,13 +1,12 @@
 package se.ifmo.lab08.client.parser;
 
-import se.ifmo.lab08.client.manager.CommandManager;
 import se.ifmo.lab08.client.Configuration;
+import se.ifmo.lab08.client.manager.CommandManager;
+import se.ifmo.lab08.client.network.Client;
 import se.ifmo.lab08.common.dto.request.GetInfoRequest;
 import se.ifmo.lab08.common.dto.response.GetInfoResponse;
 import se.ifmo.lab08.common.entity.Flat;
 import se.ifmo.lab08.common.exception.*;
-
-import se.ifmo.lab08.client.network.Client;
 import se.ifmo.lab08.common.util.IOProvider;
 import se.ifmo.lab08.common.util.Printer;
 
@@ -47,7 +46,8 @@ public class CommandParser extends DefaultParser {
                 String[] args = Arrays.copyOfRange(splitLine, 1, splitLine.length);
 
                 commandManager.getServerCommands().clear();
-                var response = (GetInfoResponse) client.sendAndReceive(new GetInfoRequest());
+                client.send(new GetInfoRequest());
+                var response = (GetInfoResponse) client.getResponse();
                 commandManager.register(response.commands());
                 client.setCredentials(response.credentials());
 

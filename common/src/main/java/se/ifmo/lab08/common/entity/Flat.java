@@ -1,7 +1,6 @@
 package se.ifmo.lab08.common.entity;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -10,7 +9,7 @@ import java.time.ZonedDateTime;
 
 @Data
 @Accessors(chain = true)
-public class Flat implements Comparable<Flat>, Serializable {
+public class Flat implements Comparable<Flat>, Serializable, Cloneable {
     private long id;
 
     private String name;
@@ -99,6 +98,15 @@ public class Flat implements Comparable<Flat>, Serializable {
         this.transport = flat.transport;
         this.house = this.house.update(flat.house);
         return this;
+    }
+
+    @Override
+    public Flat clone() {
+        try {
+            return (Flat) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public long getId() {

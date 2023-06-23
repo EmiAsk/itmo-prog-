@@ -1,5 +1,6 @@
 package se.ifmo.lab08.client.parser;
 
+import se.ifmo.lab08.client.resourcebundles.enums.FlatFormElements;
 import se.ifmo.lab08.common.exception.InterruptCommandException;
 import se.ifmo.lab08.common.parser.Parser;
 import se.ifmo.lab08.common.util.Printer;
@@ -18,9 +19,9 @@ public class DefaultParser implements Parser {
 
     public String parseString(String name, String descr) throws NoSuchElementException {
         if (descr == null || descr.equals("")) {
-            printer.printf("\nEnter %s:\n", name);
+            printer.printf("\n%s:\n", name);
         } else {
-            printer.printf("\nEnter %s (%s):\n", name, descr);
+            printer.printf("\n%s (%s):\n", name, descr);
         }
         String line = input.nextLine().strip();
 
@@ -36,7 +37,7 @@ public class DefaultParser implements Parser {
                 String line = parseString(name, descr);
                 return (line != null) ? Integer.parseInt(line) : null;
             } catch (NumberFormatException exception) {
-                printer.printf("Invalid %s.%n", name);
+                printer.print(FlatFormElements.INVALID_VALUE.toString());
             }
         }
     }
@@ -47,7 +48,7 @@ public class DefaultParser implements Parser {
                 String line = parseString(name, descr);
                 return (line != null) ? Long.parseLong(line) : null;
             } catch (NumberFormatException exception) {
-                printer.printf("Invalid %s.%n", name);
+                printer.print(FlatFormElements.INVALID_VALUE.toString());
             }
         }
     }
@@ -58,7 +59,7 @@ public class DefaultParser implements Parser {
                 String line = parseString(name, descr);
                 return (line != null) ? Float.parseFloat(line) : null;
             } catch (NumberFormatException exception) {
-                printer.printf("Invalid %s.%n", name);
+                printer.print(FlatFormElements.INVALID_VALUE.toString());
             }
         }
     }
@@ -69,7 +70,7 @@ public class DefaultParser implements Parser {
                 String line = parseString(name, descr);
                 return (line != null) ? Double.parseDouble(line) : null;
             } catch (NumberFormatException exception) {
-                printer.printf("Invalid %s.%n", name);
+                printer.print(FlatFormElements.INVALID_VALUE.toString());
             }
         }
     }
@@ -80,7 +81,7 @@ public class DefaultParser implements Parser {
                 String line = parseString(name, descr);
                 return (line != null) ? Enum.valueOf(enumType, line) : null;
             } catch (NullPointerException | IllegalArgumentException exception) {
-                printer.printf("Invalid %s.%n", name);
+                printer.print(FlatFormElements.INVALID_VALUE.toString());
             }
         }
     }

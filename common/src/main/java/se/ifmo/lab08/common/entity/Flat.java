@@ -58,7 +58,7 @@ public class Flat implements Comparable<Flat>, Serializable, Cloneable {
     }
 
     public static boolean validateNumberOfRooms(Long numberOfRooms) {
-        return (numberOfRooms == null || numberOfRooms > 0);
+        return (numberOfRooms != null && numberOfRooms > 0);
     }
 
     public static boolean validateFurnish(Furnish furnish) {

@@ -2,11 +2,15 @@ package se.ifmo.lab08.client.controller;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -15,11 +19,17 @@ import javafx.util.Duration;
 import se.ifmo.lab08.client.App;
 import se.ifmo.lab08.client.manager.CommandManager;
 import se.ifmo.lab08.client.network.Client;
+import se.ifmo.lab08.client.resourcebundles.enums.FlatFormElements;
+import se.ifmo.lab08.client.resourcebundles.enums.RuntimeOutputs;
+import se.ifmo.lab08.client.resourcebundles.enums.VisualisationFormElements;
+import se.ifmo.lab08.client.util.AlertPrinter;
+import se.ifmo.lab08.client.util.FlatFieldsValidator;
 import se.ifmo.lab08.client.util.NotificationPrinter;
 import se.ifmo.lab08.client.vizualization.FlatSprite;
 import se.ifmo.lab08.common.entity.Coordinates;
 import se.ifmo.lab08.common.entity.Flat;
 import se.ifmo.lab08.common.util.IOProvider;
+import se.ifmo.lab08.common.util.Printer;
 
 import javax.naming.TimeLimitExceededException;
 import java.io.IOException;
@@ -98,6 +108,8 @@ public class VisualizerFormController {
 
     private CommandManager commandManager = new CommandManager(Client.getInstance(), provider, 0);
 
+    private static final Printer errorPrinter = new AlertPrinter();
+
 
     static {
         configureCanvas();
@@ -105,9 +117,14 @@ public class VisualizerFormController {
 
     @FXML
     public void initialize() {
+        coordinateXTextField.setPromptText(FlatFormElements.COORDINATE_X_TEXT_FIELD.toString());
+        coordinateYTextField.setPromptText(FlatFormElements.COORDINATE_Y_TEXT_FIELD.toString());
+        coordinateXTextField.textProperty().addListener(change -> FlatFieldsValidator.coordinateXValidate(coordinateXTextField));
+        coordinateYTextField.textProperty().addListener(change -> FlatFieldsValidator.coordinateYValidate(coordinateYTextField));
+
 //        musicBandPolygons = new ArrayList<>();
-//        MainFormController.getCurrentLocale().addListener(change->updateLocale());
-//        updateLocale();
+        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
+        updateLocale();
         canvas.setOnMouseClicked(this::onCanvasMouseClicked);
         canvas.setOnMouseMoved(this::onCanvasMouseMoved);
         canvasPane.getChildren().add(canvas);
@@ -127,10 +144,9 @@ public class VisualizerFormController {
     }
 
     private void updateLocale() {
-//        coordinateXLabel.setText(VisualisationFirmElements.COORDINATE_X_LABEL.toString());
-//        coordinateYLabel.setText(VisualisationFirmElements.COORDINATE_Y_LABEL.toString());
-//        heightLabel.setText(VisualisationFirmElements.PERSON_HEIGHT_LABEL.toString());
-//        backToTableButton.setText(VisualisationFirmElements.BACK_TO_THE_TABLE_BUTTON.toString());
+        coordinateXLabel.setText(VisualisationFormElements.COORDINATE_X_LABEL.toString());
+        coordinateYLabel.setText(VisualisationFormElements.COORDINATE_Y_LABEL.toString());
+        backToTableButton.setText(VisualisationFormElements.BACK_TO_THE_TABLE_BUTTON.toString());
     }
 
     private static void configureCanvas() {
@@ -171,6 +187,7 @@ public class VisualizerFormController {
 //        if (Math.max(canvasComputedHeight, canvasComputedWidth) != 0) {
 //            canvas.getGraphicsContext2D().scale(canvas.getWidth() / Math.max(canvasComputedHeight, canvasComputedWidth), canvas.getWidth() / Math.max(canvasComputedHeight, canvasComputedWidth));
 //        }
+//            canvas.getGraphicsContext2D().scale(canvas.getWidth() / 400, canvas.getHeight() / 500);
     }
 
     private void initPolygons() {
@@ -239,7 +256,7 @@ public class VisualizerFormController {
             if (sprite.contains(newX, newY)) {
                 var currentUsername = client.credentials().getUsername();
                 if (!sprite.getFlat().getOwner().getUsername().equals(currentUsername)) {
-                    provider.getPrinter().print("You can't modify flats you don't own!");
+                    provider.getPrinter().print(RuntimeOutputs.MANAGE_FLATS.toString());
                     return;
                 }
                 flatSprite = sprite;
@@ -262,41 +279,32 @@ public class VisualizerFormController {
     @FXML
     protected void onOkButtonPressed(ActionEvent actionEvent) {
         if (selectedFlat == null) {
+            provider.getPrinter().print(RuntimeOutputs.FLAT_WAS_NOT_SELECTED_IN_TABLE.toString());
             return;
         }
+        if (!(FlatFieldsValidator.coordinateXValidate(coordinateXTextField) && FlatFieldsValidator.coordinateYValidate(coordinateYTextField))) {
+            provider.getPrinter().print(RuntimeOutputs.FIELDS_NOT_VALID.toString());
+            return;
+        }
+
         Coordinates coordinates = new Coordinates(Integer.parseInt(coordinateXTextField.getText()), Float.parseFloat(coordinateYTextField.getText()));
         selectedFlat.setCoordinates(coordinates);
-        new Thread(() -> {
+        Platform.runLater(() -> {
             try {
                 commandManager.executeServerCommand("update", new String[]{String.valueOf(selectedFlat.getId())}, selectedFlat);
                 resetSelection();
-            } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText(e.toString());
-                alert.show();
+            } catch (IOException | ClassNotFoundException e) {
+                errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
                 throw new RuntimeException(e);
+            } catch (TimeLimitExceededException ignored) {
+                errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
             }
-        }).start();
-
-//        if (FlatFieldsValidators.coordinateXValidate(coordinateXTextField)
-//                & FlatFieldsValidators.coordinateYValidate(coordinateYTextField)
-//                && FlatFieldsValidators.personHeightCheck(String.valueOf(heightSlider.getValue()))
-//                && selectedFlat != null) {
-//            Map<DataField, Object> data = selectedFlat.toHashMap();
-//            Coordinates coordinates = new Coordinates(Integer.parseInt(coordinateXTextField.getText()), Double.parseDouble(coordinateYTextField.getText()));
-//            data.put(DataField.COORDINATES, coordinates);
-//            Person person = selectedFlat.getFrontMan();
-//            person.setHeight((float) heightSlider.getValue());
-//            data.put(DataField.FRONTMAN, person);
-//            Command command = new UpdateCommand(Invoker.getInstance(), selectedFlat.getId(), data);
-//            Invoker.getInstance().invokeCommand(command);
-//        }
+        });
     }
 
     private void resetSelection() {
         coordinateXTextField.setText("");
         coordinateYTextField.setText("");
-//        heightSlider.setValue(HEIGHT_SLIDER_DEFAULT_VALUE);
         selectedFlat = null;
     }
 

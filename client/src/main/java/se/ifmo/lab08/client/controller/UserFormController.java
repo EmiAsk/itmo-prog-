@@ -11,16 +11,21 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import se.ifmo.lab08.client.App;
 import se.ifmo.lab08.client.manager.CommandManager;
 import se.ifmo.lab08.client.network.Client;
+import se.ifmo.lab08.client.resourcebundles.enums.RuntimeOutputs;
+import se.ifmo.lab08.client.resourcebundles.enums.UserFormElements;
 import se.ifmo.lab08.client.tablehandlers.UserColumnNames;
+import se.ifmo.lab08.client.util.AlertPrinter;
 import se.ifmo.lab08.client.util.NotificationPrinter;
 import se.ifmo.lab08.common.dto.Role;
 import se.ifmo.lab08.common.dto.request.UserCollectionRequest;
 import se.ifmo.lab08.common.entity.User;
 import se.ifmo.lab08.common.util.IOProvider;
+import se.ifmo.lab08.common.util.Printer;
 
 import javax.naming.TimeLimitExceededException;
 import java.io.IOException;
@@ -50,18 +55,21 @@ public class UserFormController {
 
     private static final Client client = Client.getInstance();
 
+    private static final Printer errorPrinter = new AlertPrinter();
+
     @FXML
     public void initialize() {
+        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
+        updateLocale();
 
         try {
             Client.getInstance().send(new UserCollectionRequest());
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Unable to load users");
+            alert.setContentText(RuntimeOutputs.FAILED_TO_LOAD_DATA.toString());
             alert.show();
             throw new RuntimeException(e);
         }
-
 
         TableColumn<User, Integer> idColumn = new TableColumn<>(UserColumnNames.USER_ID_COLUMN.toString());
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -74,11 +82,19 @@ public class UserFormController {
         tableView.setItems(userCollection);
     }
 
+    protected void updateLocale() {
+        commandLabel.setText(UserFormElements.COMMAND_LABEL.toString());
+        changeRoleButton.setText(UserFormElements.CHANGE_ROLE_BUTTON.toString());
+        backToTableButton.setText(UserFormElements.BACK_TO_TABLE_BUTTON.toString());
+    }
+
     protected ChangeRoleFormController initChangeRoleForm() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/ChangeRoleForm.fxml"));
         Parent node = fxmlLoader.load();
         Scene scene = new Scene(node);
         Stage stage = new Stage();
+        stage.getIcons().add(new Image("main.ico"));
+        stage.setTitle("Flat Realtor");
         ChangeRoleFormController controller = fxmlLoader.getController();
         controller.setCurrentStage(stage);
         stage.setScene(scene);
@@ -93,10 +109,13 @@ public class UserFormController {
         button.setDisable(true);
 
         try {
-
             User user = tableView.getSelectionModel().getSelectedItem();
             if (user == null) {
-                provider.getPrinter().print("User was not selected in table");
+                provider.getPrinter().print(RuntimeOutputs.USER_WAS_NOT_SELECTED_IN_TABLE.toString());
+                return;
+            }
+            if (user.getUsername().equals(client.credentials().getUsername())) {
+                provider.getPrinter().print(RuntimeOutputs.CHANGE_OWN_ROLE.toString());
                 return;
             }
             var controller = initChangeRoleForm();
@@ -106,11 +125,11 @@ public class UserFormController {
             }
             var id = String.valueOf(user.getId());
             commandManager.executeServerCommand("change_role", new String[]{id, role.name()}, null);
-        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Can not init component");
-            alert.show();
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
         } finally {
             button.setDisable(false);
         }

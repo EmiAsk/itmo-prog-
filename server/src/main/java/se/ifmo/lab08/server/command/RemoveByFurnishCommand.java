@@ -3,10 +3,13 @@ package se.ifmo.lab08.server.command;
 import se.ifmo.lab08.common.dto.StatusCode;
 import se.ifmo.lab08.common.dto.request.CommandRequest;
 import se.ifmo.lab08.common.dto.response.CommandResponse;
+import se.ifmo.lab08.common.dto.response.RemoveModelResponse;
 import se.ifmo.lab08.common.dto.response.Response;
 import se.ifmo.lab08.common.entity.Furnish;
 import se.ifmo.lab08.common.exception.InvalidArgsException;
 import se.ifmo.lab08.server.manager.CommandManager;
+
+import java.util.List;
 
 public class RemoveByFurnishCommand extends Command {
 
@@ -25,8 +28,11 @@ public class RemoveByFurnishCommand extends Command {
         Furnish furnish = Furnish.valueOf(request.args()[0]);
         var user = getUserByRequest(request);
 
-        long n = invoker.getCollection().removeByFurnish(user.getUsername(), furnish);
-        return new CommandResponse("%s flats with Furnish [%s] removed successfully.\n".formatted(n, furnish), StatusCode.OK, request.credentials());
+        List<Long> ids = invoker.getCollection().removeByFurnish(user.getUsername(), furnish);
+
+        invoker.getServer().broadcastResponse(new RemoveModelResponse(ids));
+
+        return new CommandResponse("%s flats with Furnish [%s] removed successfully.\n".formatted(ids.size(), furnish), StatusCode.OK, request.credentials());
     }
 
     @Override

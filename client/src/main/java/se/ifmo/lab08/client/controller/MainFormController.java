@@ -1,5 +1,7 @@
 package se.ifmo.lab08.client.controller;
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -8,19 +10,25 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import se.ifmo.lab08.client.App;
 import se.ifmo.lab08.client.manager.CommandManager;
 import se.ifmo.lab08.client.network.Client;
+import se.ifmo.lab08.client.resourcebundles.enums.AvailableLocales;
+import se.ifmo.lab08.client.resourcebundles.enums.MainFormElements;
+import se.ifmo.lab08.client.resourcebundles.enums.RuntimeOutputs;
 import se.ifmo.lab08.client.tablehandlers.TableViewHandler;
+import se.ifmo.lab08.client.util.AlertPrinter;
 import se.ifmo.lab08.client.util.BufferPrinter;
 import se.ifmo.lab08.client.util.NotificationPrinter;
 import se.ifmo.lab08.common.dto.Role;
 import se.ifmo.lab08.common.dto.request.FlatCollectionRequest;
 import se.ifmo.lab08.common.entity.Flat;
 import se.ifmo.lab08.common.util.IOProvider;
+import se.ifmo.lab08.common.util.Printer;
 
 import javax.naming.TimeLimitExceededException;
 import java.io.File;
@@ -31,8 +39,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class MainFormController {
-    @FXML
-    private Menu infoMenu;
 
     @FXML
     private Menu settingsMenu;
@@ -41,9 +47,6 @@ public class MainFormController {
 
     @FXML
     private MenuItem languageMenuItem;
-
-    @FXML
-    private MenuItem infoMenuItem;
 
     @FXML
     private MenuItem logOutMenuItem;
@@ -68,9 +71,6 @@ public class MainFormController {
     @FXML
     protected Button addButton;
 
-//    @FXML
-//    protected Button addIfMinButton;
-
     @FXML
     protected Button updateButton;
 
@@ -80,11 +80,8 @@ public class MainFormController {
     @FXML
     protected Button clearButton;
 
-//    @FXML
-//    protected Button filterNameButton;
-
     @FXML
-    protected Button printUniqueHouseButton;
+    protected Button shuffleButton;
 
     @FXML
     protected Button removeByFurnishButton;
@@ -107,7 +104,7 @@ public class MainFormController {
     private Map<String, Button> buttons = new HashMap<>();
 
 
-//    private static SimpleObjectProperty<Available> currentLocale = new SimpleObjectProperty<>(AvailableLocales.ENGLISH);
+    private static SimpleObjectProperty<AvailableLocales> currentLocale = new SimpleObjectProperty<>(AvailableLocales.RUSSIAN);
 
     private final int VISUALIZATION_FORM_WIDTH = 800;
 
@@ -137,56 +134,59 @@ public class MainFormController {
 
     private CommandManager commandManager = new CommandManager(Client.getInstance(), provider, 0);
 
+    private Client client = Client.getInstance();
+
+    private Printer errorPrinter = new AlertPrinter();
+
 
     @FXML
     public void initialize() {
-        mainFormController = this;
-        tableViewHandler = new TableViewHandler(tableView, modelsCollection);
-        tableViewHandler.initializeColumns();
-//        currentLocale.addListener(change -> updateLocale());
-//        updateLocale();
-        try {
-            Client.getInstance().send(new FlatCollectionRequest());
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Unable to load collection");
-            alert.show();
-            throw new RuntimeException(e);
-        }
         buttons.put("add", addButton);
         buttons.put("update", updateButton);
         buttons.put("remove_by_id", removeByIdButton);
         buttons.put("clear", clearButton);
         buttons.put("remove_all_by_furnish", removeByFurnishButton);
         buttons.put("remove_last", removeLastButton);
-        buttons.put("print_unique_house", printUniqueHouseButton);
+        buttons.put("shuffle", shuffleButton);
         buttons.put("execute_script", executeScriptButton);
 
-        handleRoleChange(Client.getInstance().credentials().getRole());
+        handleRoleChange(client.credentials().getUsername(), client.credentials().getRole());
+
+        mainFormController = this;
+        tableViewHandler = new TableViewHandler(tableView, modelsCollection);
+        tableViewHandler.initializeColumns();
+        currentLocale.addListener(change -> updateLocale());
+        updateLocale();
+        try {
+            Client.getInstance().send(new FlatCollectionRequest());
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(RuntimeOutputs.FAILED_TO_LOAD_DATA.toString());
+            alert.show();
+            throw new RuntimeException(e);
+        }
     }
 
     private void updateLocale() {
-//        tableViewHandler.initializeColumns();
-//
-//        removeFiltersButton.setText(MainFormElements.REMOVE_FILTERS_BUTTON.toString());
-//        createFilterButton.setText(MainFormElements.CREATE_FILTER_BUTTON.toString());
-//        addButton.setText(MainFormElements.ADD_BUTTON.toString());
-//        addIfMinButton.setText(MainFormElements.ADD_IF_MIN_BUTTON.toString());
-//        updateButton.setText(MainFormElements.UPDATE_BUTTON.toString());
-//        removeButton.setText(MainFormElements.REMOVE_BUTTON.toString());
-//        removeByIdButton.setText(MainFormElements.REMOVE_BY_ID_BUTTON.toString());
-//        clearButton.setText(MainFormElements.CLEAR_BUTTON.toString());
-//        filterLessThanFrontManButton.setText(MainFormElements.FILTER_LESS_THAN_FRONT_MAN_BUTTON.toString());
-//        countGreaterThanFrontManButton.setText(MainFormElements.COUNT_GREATER_THAN_FRONT_MAN_BUTTON.toString());
-//        groupCountingByCoordinatesButton.setText(MainFormElements.GROUP_COUNTING_BY_COORDINATES_BUTTON.toString());
-//        controllersLabel.setText(MainFormElements.CONTROLLERS_LABEL.toString());
-//        infoMenu.setText(MainFormElements.INFO_MENU.toString());
-//        settingsMenu.setText(MainFormElements.SETTINGS_MENU.toString());
-//        logOutMenuItem.setText(MainFormElements.LOG_OUT_MENU_ITEM.toString());
-//        languageMenuItem.setText(MainFormElements.LANGUAGE_MENU_ITEM.toString());
-//        executeScriptButton.setText(MainFormElements.EXECUTE_SCRIPT_BUTTON.toString());
-//        visualizeButton.setText(MainFormElements.VISUALIZE_BUTTON.toString());
-//        infoMenuItem.setText(MainFormElements.INFO_MENU.toString());
+        tableViewHandler.initializeColumns();
+
+        removeFiltersButton.setText(MainFormElements.REMOVE_FILTERS_BUTTON.toString());
+        createFilterButton.setText(MainFormElements.CREATE_FILTER_BUTTON.toString());
+        addButton.setText(MainFormElements.ADD_BUTTON.toString());
+        updateButton.setText(MainFormElements.UPDATE_BUTTON.toString());
+        removeLastButton.setText(MainFormElements.REMOVE_LAST_BUTTON.toString());
+        removeByFurnishButton.setText(MainFormElements.REMOVE_BY_FURNISH_BUTTON.toString());
+        removeByIdButton.setText(MainFormElements.REMOVE_BY_ID_BUTTON.toString());
+        shuffleButton.setText(MainFormElements.SHUFFLE_BUTTON.toString());
+        clearButton.setText(MainFormElements.CLEAR_BUTTON.toString());
+        controllersLabel.setText(MainFormElements.CONTROLLERS_LABEL.toString());
+        settingsMenu.setText(MainFormElements.SETTINGS_MENU.toString());
+        logOutMenuItem.setText(MainFormElements.LOG_OUT_MENU_ITEM.toString());
+        languageMenuItem.setText(MainFormElements.LANGUAGE_MENU_ITEM.toString());
+        executeScriptButton.setText(MainFormElements.EXECUTE_SCRIPT_BUTTON.toString());
+        visualizeButton.setText(MainFormElements.VISUALIZE_BUTTON.toString());
+        userMenu.setText(MainFormElements.USER_INFO_LABEL.toString().formatted(client.credentials().getUsername(), client.credentials().getRole()));
+        userButton.setText(MainFormElements.USER_BUTTON.toString());
     }
 
     @FXML
@@ -198,11 +198,11 @@ public class MainFormController {
             Flat flat = flatCreatingAndUpdatingFormController.getFlat();
             if (flat == null) return;
             commandManager.executeServerCommand("add", new String[]{}, flat);
-        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Error: " + e);
-            alert.show();
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
         } finally {
             button.setDisable(false);
         }
@@ -225,18 +225,38 @@ public class MainFormController {
 
     @FXML
     protected void onRemoveLastButtonPressed(ActionEvent actionEvent) {
-
+        Button button = (Button) actionEvent.getSource();
+        try {
+            button.setDisable(true);
+            if (modelsCollection.isEmpty()) {
+                return;
+            }
+            Flat flat = tableView.getItems().get(tableView.getItems().size() - 1);
+            if (!checkModelUserId(flat)) return;
+            commandManager.executeServerCommand("remove_by_id", new String[]{String.valueOf(flat.getId())}, null);
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
+            throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
+        } finally {
+            button.setDisable(false);
+        }
     }
 
     @FXML
     protected void onClearButtonPressed(ActionEvent actionEvent) {
+        Button button = (Button) actionEvent.getSource();
         try {
+            button.setDisable(true);
             commandManager.executeServerCommand("clear", new String[]{}, null);
-        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText(e.toString());
-            alert.show();
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
+        } finally {
+            button.setDisable(false);
         }
     }
 
@@ -263,14 +283,15 @@ public class MainFormController {
             FilterCreatorFormController controller = fxmlLoader.getController();
             Scene scene = new Scene(node, FILTER_CREATING_FROM_WIDTH, FILTER_CREATING_FORM_HEIGHT);
             Stage stage = new Stage();
+            stage.getIcons().add(new Image("main.ico"));
+            stage.setTitle("Flat Realtor");
             stage.setResizable(false);
             controller.setCurrentStage(stage);
             stage.setScene(scene);
             stage.show();
-        } catch (IOException exception) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Can not init component");
-            alert.show();
+        } catch (IOException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
+            throw new RuntimeException(e);
         }
 //        try {
 //            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FilterCreatorForm.fxml"));
@@ -317,6 +338,21 @@ public class MainFormController {
 //        }
     }
 
+    protected ChooseFurnishFormController initChooseFurnishForm() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/ChooseFurnishForm.fxml"));
+        Parent node = fxmlLoader.load();
+        Scene scene = new Scene(node);
+        Stage stage = new Stage();
+        stage.getIcons().add(new Image("main.ico"));
+        stage.setTitle("Flat Realtor");
+        ChooseFurnishFormController controller = fxmlLoader.getController();
+        controller.setCurrentStage(stage);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.showAndWait();
+        return controller;
+    }
+
     @FXML
     protected void onRemoveByIdButtonPressed(ActionEvent actionEvent) {
         Button button = (Button) actionEvent.getSource();
@@ -324,14 +360,16 @@ public class MainFormController {
             button.setDisable(true);
             Flat flat = tableView.getSelectionModel().getSelectedItem();
             if (flat == null) {
-                provider.getPrinter().print("Model was not selected");
+                provider.getPrinter().print(RuntimeOutputs.FLAT_WAS_NOT_SELECTED_IN_TABLE.toString());
                 return;
             }
             if (!checkModelUserId(flat)) return;
             commandManager.executeServerCommand("remove_by_id", new String[]{String.valueOf(flat.getId())}, null);
-        } catch (TimeLimitExceededException | IOException | ClassNotFoundException e) {
-            provider.getPrinter().print(e.toString());
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
         } finally {
             button.setDisable(false);
         }
@@ -353,7 +391,19 @@ public class MainFormController {
     }
 
     @FXML
-    protected void onPrintUniqueHouseButtonPressed(ActionEvent actionEvent) {
+    protected void onShuffleButtonPressed(ActionEvent actionEvent) {
+        Button button = (Button) actionEvent.getSource();
+        try {
+            button.setDisable(true);
+            commandManager.executeServerCommand("shuffle", new String[]{}, null);
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
+            throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
+        } finally {
+            button.setDisable(false);
+        }
 //        Button button = (Button) actionEvent.getSource();
 //        try {
 //            button.setDisable(true);
@@ -372,7 +422,9 @@ public class MainFormController {
 
     @FXML
     protected void onExecuteScriptButtonPressed(ActionEvent actionEvent) {
+        var button = (Button) actionEvent.getSource();
         try {
+            button.setDisable(true);
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showOpenDialog(new Stage());
             if (file == null || !file.exists()) {
@@ -381,23 +433,29 @@ public class MainFormController {
             var builder = new StringBuilder();
             var provider = new IOProvider(new Scanner(System.in), new BufferPrinter(builder));
             var manager = new CommandManager(Client.getInstance(), provider, 0);
-            manager.executeClientCommand("execute_script", new String[]{file.getAbsolutePath()});
-
-            this.provider.getPrinter().print("Execute command executed successfully!");
-
+            if (!manager.executeClientCommand("execute_script", new String[]{file.getAbsolutePath()})) {
+                this.provider.getPrinter().print(RuntimeOutputs.FAILED_TO_EXECUTE_COMMAND.toString());
+                return;
+            }
+            this.provider.getPrinter().print(RuntimeOutputs.COMMAND_EXECUTED.toString());
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/controller/TextAreaForm.fxml"));
             Parent node = fxmlLoader.load();
             TextAreaForm controller = fxmlLoader.getController();
             controller.setTextArea(builder.toString());
-            Scene scene = new Scene(node, FILTER_CREATING_FROM_WIDTH, FILTER_CREATING_FORM_HEIGHT);
+            Scene scene = new Scene(node);
             Stage stage = new Stage();
+            stage.setTitle("Flat Realtor");
+            stage.setResizable(false);
+            stage.getIcons().add(new Image("main.ico"));
             stage.setScene(scene);
             stage.show();
-        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText(e.toString());
-            alert.show();
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
+        } finally {
+            button.setDisable(false);
         }
 //        FileChooser fileChooser = new FileChooser();
 //        File file = fileChooser.showOpenDialog(new Stage());
@@ -428,8 +486,24 @@ public class MainFormController {
 
     @FXML
     protected void onRemoveByFurnishButtonPressed(ActionEvent actionEvent) {
-//        Command command = new GroupCountingByCoordinatesCommand(MainFormController.getMainFormController().getTableViewHandler().getSortedList().toArray(Flat[]::new));
-//        Invoker.getInstance().invokeCommand(command);
+        Button button = (Button) actionEvent.getSource();
+        button.setDisable(true);
+
+        try {
+            var controller = initChooseFurnishForm();
+            var furnish = controller.getFurnish();
+            if (furnish == null) {
+                return;
+            }
+            commandManager.executeServerCommand("remove_all_by_furnish", new String[]{furnish.name()}, null);
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
+            throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
+        } finally {
+            button.setDisable(false);
+        }
     }
 
     @FXML
@@ -444,10 +518,7 @@ public class MainFormController {
             stage.setResizable(false);
             stage.setScene(scene);
         } catch (IOException exception) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Can not init component");
-//            alert.setContentText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
-            alert.show();
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             throw new RuntimeException(exception);
         } finally {
             button.setDisable(false);
@@ -494,28 +565,31 @@ public class MainFormController {
 //        }
     }
 
-    public void handleRoleChange(Role role) {
-        try {
-            var names = commandManager.getCommandNamesByRole(role);
-            userButton.setDisable(false);
-            userButton.setVisible(true);
-            for (var button : buttons.values()) {
-                button.setDisable(false);
-                button.setVisible(true);
-            }
-            if (role != Role.ADMIN) {
-                userButton.setDisable(true);
+    public void handleRoleChange(String username, Role role) {
+        Platform.runLater(() -> {
+            try {
+                userMenu.setText(MainFormElements.USER_INFO_LABEL.toString().formatted(username, role));
+                var names = commandManager.getCommandNamesByRole(role);
+
                 userButton.setVisible(false);
-            }
-            for (var name : names) {
-                if (buttons.containsKey(name)) {
-                    buttons.get(name).setDisable(true);
-                    buttons.get(name).setVisible(false);
+                for (var button : buttons.values()) {
+                    button.setVisible(false);
                 }
+                if (role == Role.ADMIN) {
+                    userButton.setVisible(true);
+                }
+                for (var name : names) {
+                    if (buttons.containsKey(name)) {
+                        buttons.get(name).setVisible(true);
+                    }
+                }
+            } catch (IOException e) {
+                errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
+                throw new RuntimeException(e);
+            } catch (TimeLimitExceededException ignored) {
+                errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
             }
-        } catch (IOException | TimeLimitExceededException e) {
-            provider.getPrinter().print("Failed to load commands by role");
-        }
+        });
     }
 
     private AdditionalFormOfDataCollectionController initAdditionalForm() throws IOException {
@@ -524,6 +598,8 @@ public class MainFormController {
         AdditionalFormOfDataCollectionController additionalFormOfDataCollectionController = fxmlLoader.getController();
         Scene scene = new Scene(node, ADDITIONAL_FORM_WIDTH, ADDITIONAL_FORM_HEIGHT);
         Stage stage = new Stage();
+        stage.getIcons().add(new Image("main.ico"));
+        stage.setTitle("Flat Realtor");
         additionalFormOfDataCollectionController.setCurrentStage(stage);
         stage.setScene(scene);
         stage.showAndWait();
@@ -537,11 +613,11 @@ public class MainFormController {
             Parent parent = FXMLLoader.load(getClass().getResource("/controller/AuthorizationForm.fxml"));
             Scene scene = new Scene(parent, App.MAIN_SCENE_WIDTH, App.MAIN_SCENE_HEIGHT);
             App.getPrimaryStage().setScene(scene);
-        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Error: " + e);
-            alert.show();
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
         }
 //        try {
 //            Command command = new LogOutCommand(Invoker.getInstance());
@@ -562,7 +638,7 @@ public class MainFormController {
         try {
             Flat flat = tableView.getSelectionModel().getSelectedItem();
             if (flat == null) {
-                provider.getPrinter().print("Model was not selected in table");
+                provider.getPrinter().print(RuntimeOutputs.FLAT_WAS_NOT_SELECTED_IN_TABLE.toString());
                 return;
             }
             if (!checkModelUserId(flat)) return;
@@ -571,11 +647,11 @@ public class MainFormController {
             Flat updatedFlat = controller.getFlat();
             if (updatedFlat == null) return;
             commandManager.executeServerCommand("update", new String[]{String.valueOf(flat.getId())}, updatedFlat);
-        } catch (IOException | TimeLimitExceededException | ClassNotFoundException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText(e.toString());
-            alert.show();
+        } catch (IOException | ClassNotFoundException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             throw new RuntimeException(e);
+        } catch (TimeLimitExceededException ignored) {
+            errorPrinter.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
         } finally {
             button.setDisable(false);
         }
@@ -606,20 +682,21 @@ public class MainFormController {
 
     @FXML
     protected void onLanguageMenuItemPressed(ActionEvent actionEvent) {
-//        try {
-//            FXMLLoader fxmlLoader = new FXMLLoader(LanguageChangingFormController.class.getResource("LanguageChangingForm.fxml"));
-//            Parent parent = fxmlLoader.load();
-//            LanguageChangingFormController languageChangingFormController = fxmlLoader.getController();
-//            Scene scene = new Scene(parent, LANGUAGE_CHANGING_FORM_WIDTH, LANGUAGE_CHANGING_FORM_HEIGHT);
-//            Stage stage = new Stage();
-//            languageChangingFormController.setCurrentStage(stage);
-//            stage.setScene(scene);
-//            stage.show();
-//        } catch (IOException ioException) {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setContentText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
-//            alert.show();
-//        }
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(LanguageChangingFormController.class.getResource("/controller/LanguageChangingForm.fxml"));
+            Parent parent = fxmlLoader.load();
+            LanguageChangingFormController languageChangingFormController = fxmlLoader.getController();
+            Scene scene = new Scene(parent, LANGUAGE_CHANGING_FORM_WIDTH, LANGUAGE_CHANGING_FORM_HEIGHT);
+            Stage stage = new Stage();
+            stage.getIcons().add(new Image("main.ico"));
+            stage.setTitle("Flat Realtor");
+            languageChangingFormController.setCurrentStage(stage);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
@@ -638,12 +715,9 @@ public class MainFormController {
             Parent parent = fxmlLoader.load();
             Scene scene = new Scene(parent);
             stage.setScene(scene);
-        } catch (IOException exception) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Can not init component");
-//            alert.setContentText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
-            alert.show();
-            throw new RuntimeException(exception);
+        } catch (IOException e) {
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
+            throw new RuntimeException(e);
         } finally {
             button.setDisable(false);
         }
@@ -655,6 +729,8 @@ public class MainFormController {
         Parent node = fxmlLoader.load();
         Scene scene = new Scene(node, MUSIC_BAND_CREATING_AND_UPDATING_FORM_WIDTH, MUSIC_BAND_CREATING_AND_UPDATING_FORM_HEIGHT);
         Stage stage = new Stage();
+        stage.getIcons().add(new Image("main.ico"));
+        stage.setTitle("Flat Realtor");
         FlatCreatingAndUpdatingFormController musicBandCreatingAndUpdatingFormController = fxmlLoader.getController();
         musicBandCreatingAndUpdatingFormController.setCurrentStage(stage);
         stage.setScene(scene);
@@ -667,6 +743,8 @@ public class MainFormController {
         Parent node = fxmlLoader.load();
         Scene scene = new Scene(node, MUSIC_BAND_CREATING_AND_UPDATING_FORM_WIDTH, MUSIC_BAND_CREATING_AND_UPDATING_FORM_HEIGHT);
         Stage stage = new Stage();
+        stage.getIcons().add(new Image("main.ico"));
+        stage.setTitle("Flat Realtor");
         FlatCreatingAndUpdatingFormController controller = fxmlLoader.getController();
         controller.setCurrentStage(stage);
         controller.fillIn(flat);
@@ -677,7 +755,7 @@ public class MainFormController {
 
     private boolean checkModelUserId(Flat flat) {
         if (!Client.getInstance().credentials().getUsername().equals(flat.getOwner().getUsername())) {
-            provider.getPrinter().print("You can't modify flat you don't own");
+            provider.getPrinter().print(RuntimeOutputs.MANAGE_FLATS.toString());
             return false;
         }
         return true;
@@ -712,13 +790,13 @@ public class MainFormController {
         return userMenu;
     }
 
-//    public static SimpleObjectProperty<AvailableLocales> getCurrentLocale() {
-//        return currentLocale;
-//    }
+    public static SimpleObjectProperty<AvailableLocales> getCurrentLocale() {
+        return currentLocale;
+    }
 
-//    public static void setCurrentLocale(AvailableLocales availableLocales) {
-//        currentLocale.set(availableLocales);
-//    }
+    public static void setCurrentLocale(AvailableLocales availableLocales) {
+        currentLocale.set(availableLocales);
+    }
 
     public ObservableList<Flat> getModelsCollection() {
         return modelsCollection;

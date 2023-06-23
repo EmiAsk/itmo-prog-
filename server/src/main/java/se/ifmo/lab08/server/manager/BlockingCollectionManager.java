@@ -53,7 +53,7 @@ public class BlockingCollectionManager extends CollectionManager {
     }
 
     @Override
-    public long removeByFurnish(String username, Furnish furnish) {
+    public List<Long> removeByFurnish(String username, Furnish furnish) {
         try {
             lock.lock();
             return super.removeByFurnish(username, furnish);

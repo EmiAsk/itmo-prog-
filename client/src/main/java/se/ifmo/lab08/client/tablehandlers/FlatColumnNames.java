@@ -1,6 +1,10 @@
 package se.ifmo.lab08.client.tablehandlers;
 
 
+import se.ifmo.lab08.client.controller.MainFormController;
+
+import java.util.ResourceBundle;
+
 public enum FlatColumnNames {
     ID_COLUMN("id"),
     NAME_COLUMN("name"),
@@ -25,8 +29,8 @@ public enum FlatColumnNames {
 
     @Override
     public String toString() {
-//        ResourceBundle resourceBundle = ResourceBundle.getBundle("client.UI.resourcebundles.musicbandfieldsbundles.FlatFieldsRB", MainFormController.getCurrentLocale().get().getLocale());
-//        return resourceBundle.getString(bundleObjectName);
-        return bundleObjectName;
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("resourcebundle.flatfield.FlatField", MainFormController.getCurrentLocale().get().getLocale());
+        return resourceBundle.getString(bundleObjectName);
+//        return bundleObjectName;
     }
 }

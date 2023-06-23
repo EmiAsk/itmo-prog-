@@ -8,6 +8,7 @@ public class AlertPrinter implements Printer {
     public void print(String text) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setContentText(text);
+//        alert.setHeaderText("Error");
         alert.show();
     }
 
@@ -15,6 +16,7 @@ public class AlertPrinter implements Printer {
     public void printf(String format, Object... args) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setContentText(format.formatted(args));
+//        alert.setHeaderText("Error");
         alert.show();
     }
 }

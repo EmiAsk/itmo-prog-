@@ -117,7 +117,7 @@ public class Client implements AutoCloseable {
         try {
             var response = responses.poll(MAX_DELAY_SECONDS, TimeUnit.SECONDS);
             if (response == null) {
-                throw new TimeLimitExceededException("Server not available. Try later");
+                throw new TimeLimitExceededException();
             }
             return response;
         } catch (InterruptedException e) {
@@ -130,10 +130,10 @@ public class Client implements AutoCloseable {
             try {
                 var response = receiveResponse();
                 System.out.println(response.getClass().getSimpleName());
-                if (response instanceof BroadcastResponse<?> r) {
-                    if (isAuthorized()) handleBroadcastResponse(r);
-                } else if (response instanceof FlatCollectionResponse r) {
+                if (response instanceof FlatCollectionResponse r) {
                     if (isAuthorized()) handleFlatCollectionResponse(r);
+                } else if (response instanceof BroadcastResponse<?> r) {
+                    if (isAuthorized()) handleBroadcastResponse(r);
                 } else if (response instanceof UserCollectionResponse r) {
                     if (isAuthorized()) handleUserCollectionResponse(r);
                 } else {
@@ -169,7 +169,9 @@ public class Client implements AutoCloseable {
         } else if (response instanceof UpdateUserResponse userResponse) {
             UserFormController.updateUser(userResponse.getData());
             if (userResponse.getData().getUsername().equals(credentials.getUsername())) {
-                MainFormController.getMainFormController().handleRoleChange(userResponse.getData().getRole());
+                System.out.println(credentials.getRole());
+                System.out.println(userResponse.getData().getRole());
+                MainFormController.getMainFormController().handleRoleChange(credentials.getUsername(), userResponse.getData().getRole());
             }
         }
     }

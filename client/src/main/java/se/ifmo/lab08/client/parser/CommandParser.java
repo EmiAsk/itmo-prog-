@@ -3,6 +3,7 @@ package se.ifmo.lab08.client.parser;
 import se.ifmo.lab08.client.Configuration;
 import se.ifmo.lab08.client.manager.CommandManager;
 import se.ifmo.lab08.client.network.Client;
+import se.ifmo.lab08.client.resourcebundles.enums.RuntimeOutputs;
 import se.ifmo.lab08.common.dto.request.GetInfoRequest;
 import se.ifmo.lab08.common.dto.response.GetInfoResponse;
 import se.ifmo.lab08.common.entity.Flat;
@@ -39,8 +40,9 @@ public class CommandParser extends DefaultParser {
         }
         while (true) {
             try {
-                printer.printf("\nEnter command:\n");
+                printer.printf("\n%s:\n", RuntimeOutputs.ENTER_COMMAND);
                 String line = scanner.nextLine();
+                printer.print(line);
                 String[] splitLine = line.strip().split("\s+");
                 String commandName = splitLine[0].toLowerCase();
                 String[] args = Arrays.copyOfRange(splitLine, 1, splitLine.length);
@@ -57,28 +59,31 @@ public class CommandParser extends DefaultParser {
                 }
                 var serverCommand = commandManager.getServerCommand(commandName);
                 if (serverCommand.isEmpty()) {
-                    printer.print("Invalid command");
+                    printer.print(RuntimeOutputs.COMMAND_NOT_FOUND.toString());
                     continue;
                 }
                 Flat model = null;
                 if (serverCommand.get().modelRequired()) {
                     model = new FlatParser(provider.getScanner(), provider.getPrinter()).parseFlat();
                 }
+
                 commandManager.executeServerCommand(commandName, args, model);
             } catch (InterruptCommandException e) {
-                printer.print("\nExited\n");
+                printer.printf("\n%s\n\n", RuntimeOutputs.INTERRUPTED_INPUT);
             } catch (NoSuchElementException e) {
-                printer.print("EOF");
+                printer.print(RuntimeOutputs.END_OF_SCRIPT.toString());
                 break;
-            } catch (InvalidArgsException | AuthorizationException | RoleException | TimeLimitExceededException e) {
-                printer.print(e.getMessage());
+            } catch (InvalidArgsException e) {
+                printer.print(RuntimeOutputs.INVALID_ARGS.toString());
+            } catch (AuthorizationException | RoleException e) {
+                printer.print(RuntimeOutputs.COMMAND_NOT_FOUND.toString());
+            } catch (TimeLimitExceededException e) {
+                printer.print(RuntimeOutputs.SERVER_DOES_NOT_RESPOND.toString());
             } catch (RecursionException e) {
-                printer.print("Recursion depth exceeded!");
+                printer.print(RuntimeOutputs.RECURSION_ERROR.toString());
                 break;
-            } catch (IOException e) {
-                provider.getPrinter().printf("Error occurred while I/O\n%s\n", e.toString());
-            } catch (ClassNotFoundException e) {
-                provider.getPrinter().print("Invalid response format from server");
+            } catch (IOException | ClassNotFoundException e) {
+                printer.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
             }
         }
     }

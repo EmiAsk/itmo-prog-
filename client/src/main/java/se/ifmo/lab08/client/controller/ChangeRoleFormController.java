@@ -8,6 +8,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import se.ifmo.lab08.client.resourcebundles.enums.ChangeRoleFormElements;
 import se.ifmo.lab08.common.dto.Role;
 
 public class ChangeRoleFormController {
@@ -23,11 +24,26 @@ public class ChangeRoleFormController {
     private ComboBox<Role> roleComboBox;
 
     @FXML
+    private Button cancelButton;
+
+    @FXML
+    private Button okButton;
+
+    @FXML
     protected void initialize() {
         roleComboBox.setItems(FXCollections.observableArrayList(Role.values()));
         roleComboBox.getItems().add(null);
+
+        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
+        updateLocale();
     }
 
+    protected void updateLocale() {
+        roleLabel.setText(ChangeRoleFormElements.ROLE_LABEL.toString());
+        roleComboBox.setPromptText(ChangeRoleFormElements.ROLE_COMBOBOX.toString());
+        okButton.setText(ChangeRoleFormElements.OK_BUTTON.toString());
+        cancelButton.setText(ChangeRoleFormElements.CANCEL_BUTTON.toString());
+    }
 
     public void setCurrentStage(Stage stage) {
         this.currentStage = stage;
@@ -63,7 +79,6 @@ public class ChangeRoleFormController {
         }
 //        Notifications.create().text(RuntimeOutputs.FIELDS_DOES_NOT_VALID.toString()).position(Pos.TOP_CENTER).show();
         currentStage.close();
-        this.role = role;
     }
 
     @FXML

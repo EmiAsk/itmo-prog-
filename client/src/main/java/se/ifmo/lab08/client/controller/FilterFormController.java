@@ -35,11 +35,11 @@ public class FilterFormController {
     public void initialize() {
         removeButtonPressedEventHandler = this::removeListeners;
         MainFormController.getMainFormController().getRemoveFiltersButton().addEventHandler(MouseEvent.MOUSE_CLICKED, removeButtonPressedEventHandler);
-//        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
+        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
     }
 
     private void updateLocale() {
-//        columnForFilteringLabel.setText(columnForFiltering.toString());
+        columnForFilteringLabel.setText(columnForFiltering.toString());
     }
 
     @FXML

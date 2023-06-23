@@ -55,7 +55,7 @@ public class RoleManager {
     }
 
     public void check(String command, Role role) {
-        var commandRole = this.roles.getOrDefault(command, Role.MIDDLE_USER);
+        var commandRole = this.roles.getOrDefault(command, Role.MIN_USER);
         if (role == null || role.weight() < commandRole.weight()) {
             throw new RoleException("Permission denied");
         }

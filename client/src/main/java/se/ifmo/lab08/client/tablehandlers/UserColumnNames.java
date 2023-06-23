@@ -1,5 +1,9 @@
 package se.ifmo.lab08.client.tablehandlers;
 
+import se.ifmo.lab08.client.controller.MainFormController;
+
+import java.util.ResourceBundle;
+
 
 public enum UserColumnNames {
     USER_ID_COLUMN("id"),
@@ -14,8 +18,7 @@ public enum UserColumnNames {
 
     @Override
     public String toString() {
-//        ResourceBundle resourceBundle = ResourceBundle.getBundle("client.UI.resourcebundles.musicbandfieldsbundles.FlatFieldsRB", MainFormController.getCurrentLocale().get().getLocale());
-//        return resourceBundle.getString(bundleObjectName);
-        return bundleObjectName;
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("resourcebundle.userfield.UserField", MainFormController.getCurrentLocale().get().getLocale());
+        return resourceBundle.getString(bundleObjectName);
     }
 }

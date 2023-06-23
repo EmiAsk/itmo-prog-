@@ -12,17 +12,21 @@ public class Coordinates implements Serializable {
     private long x;
     private Float y;
 
+    private static final long LIMIT_X = 540;
+    private static final float LIMIT_Y = 498;
+
+
     public Coordinates(long x, Float y) {
         this.x = x;
         this.y = y;
     }
 
     public static boolean validateX(Long x) {
-        return (x != null && x > -952L);
+        return (x != null && x >= 0 && x <= LIMIT_X);
     }
 
     public static boolean validateY(Float y) {
-        return (y != null && y <= 779F);
+        return (y != null && y >= 0 && y <= LIMIT_Y);
     }
 
     public boolean validate() {

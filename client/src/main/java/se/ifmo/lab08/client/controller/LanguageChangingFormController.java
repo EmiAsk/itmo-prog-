@@ -3,12 +3,14 @@ package se.ifmo.lab08.client.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import se.ifmo.lab08.client.resourcebundles.enums.AvailableLocales;
 
 public class LanguageChangingFormController {
-//    @FXML
-//    private ComboBox<AvailableLocales> languageComboBox;
+    @FXML
+    private ComboBox<AvailableLocales> languageComboBox;
 
     private Stage currentStage;
 
@@ -18,8 +20,8 @@ public class LanguageChangingFormController {
     }
 
     private void initLanguages() {
-//        Arrays.stream(AvailableLocales.values()).forEach(languageComboBox.getItems()::add);
-//        languageComboBox.setValue(MainFormController.getCurrentLocale().get());
+        languageComboBox.getItems().addAll(AvailableLocales.values());
+        languageComboBox.setValue(MainFormController.getCurrentLocale().get());
     }
 
     @FXML
@@ -29,8 +31,8 @@ public class LanguageChangingFormController {
 
     @FXML
     protected void onOkButtonPressed(ActionEvent actionEvent) {
-//        MainFormController.setCurrentLocale(languageComboBox.getValue());
-//        currentStage.close();
+        MainFormController.setCurrentLocale(languageComboBox.getValue());
+        currentStage.close();
     }
 
     @FXML

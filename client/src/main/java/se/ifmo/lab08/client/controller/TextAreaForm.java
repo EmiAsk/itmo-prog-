@@ -10,15 +10,9 @@ public class TextAreaForm {
     @FXML
     public void initialize() {
         textArea.setEditable(false);
-//        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
-    }
-
-    private void updateLocale() {
-//        columnForFilteringLabel.setText(columnForFiltering.toString());
     }
 
     public void setTextArea(String text) {
         textArea.setText(text);
     }
-
 }

@@ -21,7 +21,7 @@ public class House implements Serializable {
     }
 
     public static boolean validateYear(Long year) {
-        return (year == null || (year > 0 && year <= 636));
+        return (year != null && (year > 0 && year <= 636));
     }
 
     public static boolean validateFlatsNumber(Integer number) {

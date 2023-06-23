@@ -8,12 +8,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import se.ifmo.lab08.client.resourcebundles.enums.FlatFormElements;
+import se.ifmo.lab08.client.resourcebundles.enums.RuntimeOutputs;
+import se.ifmo.lab08.client.util.FlatFieldsValidator;
+import se.ifmo.lab08.client.util.NotificationPrinter;
 import se.ifmo.lab08.common.entity.*;
+import se.ifmo.lab08.common.util.Printer;
 
 public class FlatCreatingAndUpdatingFormController {
     @FXML
     private TextField bandNameTextField;
-    private boolean isBandNameValidity;
+    private boolean isFlatNameValidity;
     @FXML
     private TextField coordinateXTextField;
 
@@ -26,7 +31,7 @@ public class FlatCreatingAndUpdatingFormController {
     private boolean isAreaValidity;
     @FXML
     private TextField numberOfRoomsTextField;
-    private boolean isNumberOfRoomsTextFieldValidity;
+    private boolean isNumberOfRoomsValidity;
     @FXML
     private ComboBox<Furnish> furnishComboBox;
     private boolean isFurnishValidity;
@@ -44,7 +49,7 @@ public class FlatCreatingAndUpdatingFormController {
     private boolean isHouseYearValidity;
     @FXML
     private TextField houseNumberOfFlatsTextField;
-    private boolean isHouseNumberOfFlatsTextFieldValidity;
+    private boolean isHouseNumberOfFlatsValidity;
 
     @FXML
     private Label bandNameLabel;
@@ -90,73 +95,72 @@ public class FlatCreatingAndUpdatingFormController {
 
     private Stage currentStage;
 
+    private static Printer printer = new NotificationPrinter();
+
     @FXML
     public void initialize() {
         initListeners();
         preValidation();
         initComboBoxes();
-//        updateLocale();
-//        MainFormController.getCurrentLocale().addListener(change->updateLocale());
+        updateLocale();
+        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
     }
 
     private void updateLocale() {
-//
-//        bandNameTextField.setPromptText(FlatCreatingAndUpdatingFormElements.BAND_NAME_TEXT_FIELD.toString());
-//        coordinateXTextField.setPromptText(FlatCreatingAndUpdatingFormElements.COORDINATE_X_TEXT_FIELD.toString());
-//        coordinateYTextField.setPromptText(FlatCreatingAndUpdatingFormElements.COORDINATE_Y_TEXT_FIELD.toString());
-//        numberOfParticipantsTextField.setPromptText(FlatCreatingAndUpdatingFormElements.NUMBER_OF_PARTICIPANTS_TEXT_FIELD.toString());
-//        genreComboBox.setPromptText(FlatCreatingAndUpdatingFormElements.GENRE_COMBO_BOX.toString());
-//        personNameTextField.setPromptText(FlatCreatingAndUpdatingFormElements.PERSON_NAME_TEXT_FIELD.toString());
-//        personHeightTextField.setPromptText(FlatCreatingAndUpdatingFormElements.PERSON_HEIGHT_TEXT_FIELD.toString());
-//        personNationalityComboBox.setPromptText(FlatCreatingAndUpdatingFormElements.PERSON_NATIONALITY_COMBO_BOX.toString());
-//        locationXTextField.setPromptText(FlatCreatingAndUpdatingFormElements.LOCATION_X_TEXT_FIELD.toString());
-//        locationYTextField.setPromptText(FlatCreatingAndUpdatingFormElements.LOCATION_Y_TEXT_FIELD.toString());
-//        locationZTextField.setPromptText(FlatCreatingAndUpdatingFormElements.LOCATION_Z_TEXT_FIELD.toString());
-//
-//        bandNameLabel.setText(FlatCreatingAndUpdatingFormElements.BAND_NAME_LABEL.toString());
-//        coordinateXLabel.setText(FlatCreatingAndUpdatingFormElements.COORDINATE_X_LABEL.toString());
-//        coordinateYLabel.setText(FlatCreatingAndUpdatingFormElements.COORDINATE_Y_LABEL.toString());
-//        numberOfParticipantsLabel.setText(FlatCreatingAndUpdatingFormElements.NUMBER_OF_PARTICIPANTS_LABEL.toString());
-//        genreLabel.setText(FlatCreatingAndUpdatingFormElements.GENRE_LABEL.toString());
-//        personNameLabel.setText(FlatCreatingAndUpdatingFormElements.PERSON_NAME_LABEL.toString());
-//        personHeightLabel.setText(FlatCreatingAndUpdatingFormElements.PERSON_HEIGHT_LABEL.toString());
-//        personNationalityLabel.setText(FlatCreatingAndUpdatingFormElements.PERSON_NATIONALITY_LABEL.toString());
-//        locationXLabel.setText(FlatCreatingAndUpdatingFormElements.LOCATION_X_LABEL.toString());
-//        locationYLabel.setText(FlatCreatingAndUpdatingFormElements.LOCATION_Y_LABEL.toString());
-//        locationZLabel.setText(FlatCreatingAndUpdatingFormElements.LOCATION_Z_LABEL.toString());
-//
-//        okButton.setText(FlatCreatingAndUpdatingFormElements.OK_Button.toString());
-//        cancelButton.setText(FlatCreatingAndUpdatingFormElements.CANCEL_BUTTON.toString());
+
+        bandNameTextField.setPromptText(FlatFormElements.FLAT_NAME_TEXT_FIELD.toString());
+        coordinateXTextField.setPromptText(FlatFormElements.COORDINATE_X_TEXT_FIELD.toString());
+        coordinateYTextField.setPromptText(FlatFormElements.COORDINATE_Y_TEXT_FIELD.toString());
+        areaTextField.setPromptText(FlatFormElements.AREA_TEXT_FIELD.toString());
+        numberOfRoomsTextField.setPromptText(FlatFormElements.NUMBER_OF_ROOMS_TEXT_FIELD.toString());
+        furnishComboBox.setPromptText(FlatFormElements.FURNISH_COMBO_BOX.toString());
+        viewComboBox.setPromptText(FlatFormElements.VIEW_COMBO_BOX.toString());
+        transportComboBox.setPromptText(FlatFormElements.TRANSPORT_COMBO_BOX.toString());
+        houseNameTextField.setPromptText(FlatFormElements.HOUSE_NAME_TEXT_FIELD.toString());
+        houseYearTextField.setPromptText(FlatFormElements.HOUSE_YEAR_TEXT_FIELD.toString());
+        houseNumberOfFlatsTextField.setPromptText(FlatFormElements.HOUSE_NUMBER_OF_FLATS_TEXT_FIELD.toString());
+
+        bandNameLabel.setText(FlatFormElements.FLAT_NAME_LABEL.toString());
+        coordinateXLabel.setText(FlatFormElements.COORDINATE_X_LABEL.toString());
+        coordinateYLabel.setText(FlatFormElements.COORDINATE_Y_LABEL.toString());
+        areaLabel.setText(FlatFormElements.AREA_LABEL.toString());
+        numberOfRoomsLabel.setText(FlatFormElements.NUMBER_OF_ROOMS_LABEL.toString());
+        furnishLabel.setText(FlatFormElements.FURNISH_LABEL.toString());
+        viewLabel.setText(FlatFormElements.VIEW_LABEL.toString());
+        transportLabel.setText(FlatFormElements.TRANSPORT_LABEL.toString());
+        houseNameLabel.setText(FlatFormElements.HOUSE_NAME_LABEL.toString());
+        houseYearLabel.setText(FlatFormElements.HOUSE_YEAR_LABEL.toString());
+        houseNumberOfFlatsLabel.setText(FlatFormElements.HOUSE_NUMBER_OF_FLATS_LABEL.toString());
+        okButton.setText(FlatFormElements.OK_Button.toString());
+        cancelButton.setText(FlatFormElements.CANCEL_BUTTON.toString());
     }
 
     private void preValidation() {
-//        FlatFieldsValidators.bandNameValidate(bandNameTextField, this);
-//        FlatFieldsValidators.coordinateXValidate(coordinateXTextField, this);
-//        FlatFieldsValidators.coordinateYValidate(coordinateYTextField, this);
-//        FlatFieldsValidators.numberOfParticipantsValidate(numberOfParticipantsTextField, this);
-//        FlatFieldsValidators.genreValidate(genreComboBox, this);
-//        FlatFieldsValidators.personNameValidate(personNameTextField, this);
-//        FlatFieldsValidators.personHeightValidate(personHeightTextField, this);
-//        FlatFieldsValidators.personNationalityValidate(personNationalityComboBox, this);
-//        FlatFieldsValidators.locationXValidate(locationXTextField, this);
-//        FlatFieldsValidators.locationYValidate(locationYTextField, this);
-//        FlatFieldsValidators.locationZValidate(locationZTextField, this);
-
+        FlatFieldsValidator.flatNameValidate(bandNameTextField, this);
+        FlatFieldsValidator.coordinateXValidate(coordinateXTextField, this);
+        FlatFieldsValidator.coordinateYValidate(coordinateYTextField, this);
+        FlatFieldsValidator.numberOfRoomsValidate(numberOfRoomsTextField, this);
+        FlatFieldsValidator.areaValidate(areaTextField, this);
+        FlatFieldsValidator.furnishValidate(furnishComboBox, this);
+        FlatFieldsValidator.viewValidate(viewComboBox, this);
+        FlatFieldsValidator.transportValidate(transportComboBox, this);
+        FlatFieldsValidator.houseNameValidate(houseNameTextField, this);
+        FlatFieldsValidator.houseYearValidate(houseYearTextField, this);
+        FlatFieldsValidator.houseNumberOfFlatsValidate(houseNumberOfFlatsTextField, this);
     }
 
     private void initListeners() {
-//        bandNameTextField.textProperty().addListener(change-> FlatFieldsValidators.bandNameValidate(bandNameTextField, this));
-//        coordinateXTextField.textProperty().addListener(change->FlatFieldsValidators.coordinateXValidate(coordinateXTextField, this));
-//        coordinateYTextField.textProperty().addListener(change->FlatFieldsValidators.coordinateYValidate(coordinateYTextField, this));
-//        numberOfParticipantsTextField.textProperty().addListener(change -> FlatFieldsValidators.numberOfParticipantsValidate(numberOfParticipantsTextField, this));
-//        genreComboBox.valueProperty().addListener(change->FlatFieldsValidators.genreValidate(genreComboBox, this));
-//        personNameTextField.textProperty().addListener(change->FlatFieldsValidators.personNameValidate(personNameTextField, this));
-//        personHeightTextField.textProperty().addListener(change -> FlatFieldsValidators.personHeightValidate(personHeightTextField, this));
-//        personNationalityComboBox.valueProperty().addListener(change -> FlatFieldsValidators.personNationalityValidate(personNationalityComboBox, this));
-//        locationXTextField.textProperty().addListener(change->FlatFieldsValidators.locationXValidate(locationXTextField, this));
-//        locationYTextField.textProperty().addListener(change->FlatFieldsValidators.locationYValidate(locationYTextField, this));
-//        locationZTextField.textProperty().addListener(change->FlatFieldsValidators.locationZValidate(locationZTextField, this));
-
+        bandNameTextField.textProperty().addListener(change -> FlatFieldsValidator.flatNameValidate(bandNameTextField, this));
+        coordinateXTextField.textProperty().addListener(change -> FlatFieldsValidator.coordinateXValidate(coordinateXTextField, this));
+        coordinateYTextField.textProperty().addListener(change -> FlatFieldsValidator.coordinateYValidate(coordinateYTextField, this));
+        numberOfRoomsTextField.textProperty().addListener(change -> FlatFieldsValidator.numberOfRoomsValidate(numberOfRoomsTextField, this));
+        areaTextField.textProperty().addListener(change -> FlatFieldsValidator.areaValidate(areaTextField, this));
+        furnishComboBox.valueProperty().addListener(change -> FlatFieldsValidator.furnishValidate(furnishComboBox, this));
+        viewComboBox.valueProperty().addListener(change -> FlatFieldsValidator.viewValidate(viewComboBox, this));
+        transportComboBox.valueProperty().addListener(change -> FlatFieldsValidator.transportValidate(transportComboBox, this));
+        houseNameTextField.textProperty().addListener(change -> FlatFieldsValidator.houseNameValidate(houseNameTextField, this));
+        houseYearTextField.textProperty().addListener(change -> FlatFieldsValidator.houseYearValidate(houseYearTextField, this));
+        houseNumberOfFlatsTextField.textProperty().addListener(change -> FlatFieldsValidator.houseNumberOfFlatsValidate(houseNumberOfFlatsTextField, this));
     }
 
     public void fillIn(Flat flat) {
@@ -214,8 +218,8 @@ public class FlatCreatingAndUpdatingFormController {
             currentStage.close();
             return;
         }
+        printer.print(RuntimeOutputs.FIELDS_NOT_VALID.toString());
 //        Notifications.create().text(RuntimeOutputs.FIELDS_DOES_NOT_VALID.toString()).position(Pos.TOP_CENTER).show();
-        currentStage.close();
     }
 
     @FXML
@@ -271,56 +275,55 @@ public class FlatCreatingAndUpdatingFormController {
 //    }
 
     private boolean checkValidities() {
-//        return isBandNameValidity && isCoordinateXValidity && isCoordinateYValidity
-//                && isGenreValidity && isLocationYValidity && isLocationXValidity
-//                && isLocationZValidity && isNumberOfParticipantsValidity && isPersonNameValidity
-//                && isPersonHeightValidity;
-        return true;
+        return isFlatNameValidity && isCoordinateXValidity && isCoordinateYValidity
+                && isAreaValidity && isNumberOfRoomsValidity && isFurnishValidity
+                && isViewValidity && isTransportValidity && isHouseNameValidity
+                && isHouseYearValidity && isHouseNumberOfFlatsValidity;
     }
-//
-//    public void setBandNameValidity(boolean bandNameValidity) {
-//        isBandNameValidity = bandNameValidity;
-//    }
-//
-//    public void setCoordinateXValidity(boolean coordinateXValidity) {
-//        isCoordinateXValidity = coordinateXValidity;
-//    }
-//
-//    public void setCoordinateYValidity(boolean coordinateYValidity) {
-//        isCoordinateYValidity = coordinateYValidity;
-//    }
-//
-//    public void setNumberOfParticipantsValidity(boolean numberOfParticipantsValidity) {
-//        isNumberOfParticipantsValidity = numberOfParticipantsValidity;
-//    }
-//
-//    public void setGenreValidity(boolean genreValidity) {
-//        isGenreValidity = genreValidity;
-//    }
-//
-//    public void setPersonNameValidity(boolean personNameValidity) {
-//        isPersonNameValidity = personNameValidity;
-//    }
-//
-//    public void setPersonHeightValidity(boolean personHeightValidity) {
-//        isPersonHeightValidity = personHeightValidity;
-//    }
-//
-//    public void setPersonNationalityValidity(boolean personNationalityValidity) {
-////        isPersonNationalityValidity = personNationalityValidity;
-//    }
-//
-//    public void setLocationXValidity(boolean locationXValidity) {
-//        isLocationXValidity = locationXValidity;
-//    }
-//
-//    public void setLocationYValidity(boolean locationYValidity) {
-//        isLocationYValidity = locationYValidity;
-//    }
-//
-//    public void setLocationZValidity(boolean locationZValidity) {
-//        isLocationZValidity = locationZValidity;
-//    }
+
+    public void setFlatNameValidity(boolean flatNameValidity) {
+        isFlatNameValidity = flatNameValidity;
+    }
+
+    public void setCoordinateXValidity(boolean coordinateXValidity) {
+        isCoordinateXValidity = coordinateXValidity;
+    }
+
+    public void setCoordinateYValidity(boolean coordinateYValidity) {
+        isCoordinateYValidity = coordinateYValidity;
+    }
+
+    public void setNumberOfRoomsValidity(boolean numberOfRoomsValidity) {
+        isNumberOfRoomsValidity = numberOfRoomsValidity;
+    }
+
+    public void setAreaValidity(boolean areaValidity) {
+        isAreaValidity = areaValidity;
+    }
+
+    public void setFurnishValidity(boolean furnishValidity) {
+        isFurnishValidity = furnishValidity;
+    }
+
+    public void setViewValidity(boolean viewValidity) {
+        isViewValidity = viewValidity;
+    }
+
+    public void setTransportValidity(boolean transportValidity) {
+        isTransportValidity = transportValidity;
+    }
+
+    public void setHouseNameValidity(boolean houseNameValidity) {
+        isHouseNameValidity = houseNameValidity;
+    }
+
+    public void setHouseYearValidity(boolean houseYearValidity) {
+        isHouseYearValidity = houseYearValidity;
+    }
+
+    public void setHouseNumberOfFlatsValidity(boolean houseNumberOfFlatsValidity) {
+        isHouseNumberOfFlatsValidity = houseNumberOfFlatsValidity;
+    }
 
     public void setCurrentStage(Stage stage) {
         this.currentStage = stage;

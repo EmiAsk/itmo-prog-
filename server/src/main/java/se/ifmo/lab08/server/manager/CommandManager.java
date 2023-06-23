@@ -34,7 +34,7 @@ public class CommandManager {
     private final IOProvider provider;
 
     public CommandManager(CollectionManager collection, IOProvider provider, AuthManager authManager, RoleManager roleManager) {
-        register("info", new InfoCommand(this));
+//        register("info", new InfoCommand(this));
 //        register("show", new ShowCommand(this));
         register("add", new AddCommand(this));
         register("update", new UpdateCommand(this));
@@ -44,8 +44,8 @@ public class CommandManager {
 //        register("add_if_min", new AddIfMinCommand(provider, collection));
         register("shuffle", new ShuffleCommand(this));
         register("remove_all_by_furnish", new RemoveByFurnishCommand(this));
-        register("filter_starts_with_name", new FilterNameCommand(this));
-        register("print_unique_house", new PrintUniqueHouseCommand(this));
+//        register("filter_starts_with_name", new FilterNameCommand(this));
+//        register("print_unique_house", new PrintUniqueHouseCommand(this));
         register("sign_up", new SignUpCommand(this));
         register("login", new LoginCommand(this));
         register("logout", new LogoutCommand(this));

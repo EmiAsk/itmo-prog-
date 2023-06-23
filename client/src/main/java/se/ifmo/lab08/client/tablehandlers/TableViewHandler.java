@@ -59,8 +59,11 @@ public class TableViewHandler {
     }
 
     public void updateElement(Flat newFlat) {
-        if (modelsCollection.removeIf(oldFlat -> oldFlat.getId() == newFlat.getId())) {
-            modelsCollection.add(newFlat);
+
+        for (int i = 0; i < modelsCollection.size(); i++) {
+            if (modelsCollection.get(i).getId() == newFlat.getId()) {
+                modelsCollection.set(i, newFlat);
+            }
         }
     }
 

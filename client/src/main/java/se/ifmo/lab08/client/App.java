@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import se.ifmo.lab08.client.controller.AuthorizationFormController;
 import se.ifmo.lab08.client.manager.CommandManager;
@@ -39,6 +40,8 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         Parent parent = FXMLLoader.load(getClass().getResource("/controller/AuthorizationForm.fxml"));
         primaryStage = stage;
+        stage.getIcons().add(new Image("main.ico"));
+        stage.setTitle("Flat Realtor");
         Scene scene = new Scene(parent, MAIN_SCENE_WIDTH, MAIN_SCENE_HEIGHT);
         stage.setScene(scene);
         stage.setMinWidth(MAIN_SCENE_WIDTH);

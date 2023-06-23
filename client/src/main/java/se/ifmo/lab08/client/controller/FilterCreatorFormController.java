@@ -9,12 +9,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import se.ifmo.lab08.client.resourcebundles.enums.FilterCreatorFormElements;
+import se.ifmo.lab08.client.resourcebundles.enums.RuntimeOutputs;
 import se.ifmo.lab08.client.tablehandlers.FixedNameTableColumn;
 import se.ifmo.lab08.client.tablehandlers.FlatColumnNames;
 import se.ifmo.lab08.client.tablehandlers.TableViewHandler;
 import se.ifmo.lab08.client.tablehandlers.predicatefactory.AbstractPredicateFactory;
 import se.ifmo.lab08.client.tablehandlers.predicatefactory.FilterSigns;
 import se.ifmo.lab08.client.tablehandlers.predicatefactory.PredicateFactory;
+import se.ifmo.lab08.client.util.AlertPrinter;
 import se.ifmo.lab08.client.util.NotificationPrinter;
 import se.ifmo.lab08.common.entity.Flat;
 import se.ifmo.lab08.common.util.Printer;
@@ -56,27 +59,29 @@ public class FilterCreatorFormController {
 
     private final Printer printer = new NotificationPrinter();
 
+    private final Printer errorPrinter = new AlertPrinter();
+
     @FXML
     public void initialize() {
         mainFiltersHBox = MainFormController.getMainFormController().getFiltersHBox();
         tableView = MainFormController.getMainFormController().getTableView();
-//        updateLocale();
         initColumns();
         columnsForFilteringComboBox.valueProperty().addListener(change -> columnsForFilteringComboBoxChanged());
         initSigns();
-//        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
+        updateLocale();
+        MainFormController.getCurrentLocale().addListener(change -> updateLocale());
     }
 
     private void updateLocale() {
-//        filterColumnLabel.setText(FilterCreatorFormElements.FILTER_COLUMN_LABEL.toString());
-//        signLabel.setText(FilterCreatorFormElements.SIGN_LABEL.toString());
-//        valueForFilteringLabel.setText(FilterCreatorFormElements.VALUE_FOR_FILTERING_LABEL.toString());
-//        filteringValueTextField.setPromptText(FilterCreatorFormElements.FILTERING_VALUE_TEXT_FIELD.toString());
-//        columnsForFilteringComboBox.setPromptText(FilterCreatorFormElements.COLUMNS_FOR_FILTERING_COMBO_BOX.toString());
-//        signsCombobox.setPromptText(FilterCreatorFormElements.SIGNS_COMBO_BOX.toString());
-//
-//        createButton.setText(FilterCreatorFormElements.CREATE_BUTTON.toString());
-//        cancelButton.setText(FilterCreatorFormElements.CANCEL_BUTTON.toString());
+        filterColumnLabel.setText(FilterCreatorFormElements.FILTER_COLUMN_LABEL.toString());
+        signLabel.setText(FilterCreatorFormElements.SIGN_LABEL.toString());
+        valueForFilteringLabel.setText(FilterCreatorFormElements.VALUE_FOR_FILTERING_LABEL.toString());
+        filteringValueTextField.setPromptText(FilterCreatorFormElements.FILTERING_VALUE_TEXT_FIELD.toString());
+        columnsForFilteringComboBox.setPromptText(FilterCreatorFormElements.COLUMNS_FOR_FILTERING_COMBO_BOX.toString());
+        signsCombobox.setPromptText(FilterCreatorFormElements.SIGNS_COMBO_BOX.toString());
+
+        createButton.setText(FilterCreatorFormElements.CREATE_BUTTON.toString());
+        cancelButton.setText(FilterCreatorFormElements.CANCEL_BUTTON.toString());
     }
 
     private void columnsForFilteringComboBoxChanged() {
@@ -114,11 +119,8 @@ public class FilterCreatorFormController {
                 currentStage.close();
             }
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setHeaderText(RuntimeOutputs.CAN_NOT_INIT_COMPONENT.toString());
-            alert.setHeaderText("Can not init component");
-            alert.setContentText(e.getMessage());
-            alert.show();
+            errorPrinter.print(RuntimeOutputs.SOMETHING_WENT_WRONG.toString());
+            throw new RuntimeException(e);
         }
     }
 
@@ -127,7 +129,8 @@ public class FilterCreatorFormController {
         FixedNameTableColumn fixedNameTableColumn = (FixedNameTableColumn) tableView.getColumns().stream()
                 .filter(x -> ((FixedNameTableColumn) x).getFixedName() == columnsForFilteringComboBox.getValue())
                 .findAny().get();
-
+        System.out.println(filteringValueTextField.getText());
+        System.out.println(filteringValueTextField.getText().length());
         if (fixedNameTableColumn.getFixedName() == FlatColumnNames.CREATION_DATE_COLUMN && datePicker.getValue() != null) {
             filteringValueTextField.setText(datePicker.getValue().toString());
         }
@@ -136,7 +139,7 @@ public class FilterCreatorFormController {
         PredicateFactory predicateFactory = abstractPredicateFactory.createFactory(fixedNameTableColumn.getFixedName());
         Predicate<Flat> predicate =
                 predicateFactory.createPredicate(signsCombobox.getValue(),
-                        filteringValueTextField.getText());
+                        filteringValueTextField.getText().isBlank() ? null : filteringValueTextField.getText());
         TableViewHandler.getPredicates().add(predicate);
         filterFormController.setPredicate(predicate);
         return true;
@@ -160,8 +163,7 @@ public class FilterCreatorFormController {
             filterFormController.setColumnForFilteringLabel(columnsForFilteringComboBox.getValue());
             return true;
         }
-        printer.print("Column was not selected");
-//        Notifications.create().position(Pos.TOP_CENTER).text(RuntimeOutputs.COLUMN_WAS_NOT_SELECTED.toString()).show();
+        printer.print(RuntimeOutputs.COLUMN_WAS_NOT_SELECTED.toString());
         return false;
     }
 
@@ -170,8 +172,7 @@ public class FilterCreatorFormController {
             filterFormController.setFilterSignLabel(signsCombobox.getValue());
             return true;
         }
-        printer.print("Sign was not selected");
-//        Notifications.create().position(Pos.TOP_CENTER).text(RuntimeOutputs.SIGN_WAS_NOT_SELECTED.toString()).show();
+        printer.print(RuntimeOutputs.SIGN_WAS_NOT_SELECTED.toString());
         return false;
     }
 

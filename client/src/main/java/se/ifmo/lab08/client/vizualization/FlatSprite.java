@@ -31,10 +31,13 @@ public class FlatSprite {
 
     private static final int VELOCITY = 1; // pixels per frame
 
-    private static final String IMAGE_LOC = "animation/frame_%02d_delay-0.03s.gif";
+    private static final String LEFT_IMAGE_LOC = "animation/left/frame_%02d_delay-0.03s.gif";
 
-    //    private static final Image images = new Image(IMAGE_LOC, HEIGHT, WIDTH, false, false);
-    private static final List<Image> images = new ArrayList<>();
+    private static final String RIGHT_IMAGE_LOC = "animation/right/frame_%02d_delay-0.03s.gif";
+
+    private static final List<Image> leftImages = new ArrayList<>();
+
+    private static final List<Image> rightImages = new ArrayList<>();
 
     private static final int FRAMES = 31;
 
@@ -42,7 +45,10 @@ public class FlatSprite {
 
     static {
         for (int i = 0; i < FRAMES; i++) {
-            images.add(new Image(IMAGE_LOC.formatted(i)));
+            leftImages.add(new Image(LEFT_IMAGE_LOC.formatted(i)));
+        }
+        for (int i = 0; i < FRAMES; i++) {
+            rightImages.add(new Image(RIGHT_IMAGE_LOC.formatted(i)));
         }
     }
 
@@ -91,7 +97,11 @@ public class FlatSprite {
     }
 
     public void draw() {
-        canvas.getGraphicsContext2D().drawImage(images.get(frameNumber), x, y);
+        if (velX >= 0) {
+            canvas.getGraphicsContext2D().drawImage(rightImages.get(frameNumber), x, y);
+        } else {
+            canvas.getGraphicsContext2D().drawImage(leftImages.get(frameNumber), x, y);
+        }
     }
 
     public double getX() {

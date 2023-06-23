@@ -88,12 +88,12 @@ public class CollectionManager {
         Collections.shuffle(collection);
     }
 
-    public long removeByFurnish(String username, Furnish furnish) {
-        long n = collection.stream()
+    public List<Long> removeByFurnish(String username, Furnish furnish) {
+        List<Long> ids = collection.stream()
                 .filter(flat -> flat.getFurnish() == furnish && flat.getOwner().getUsername().equals(username))
-                .count();
+                .map(Flat::getId).toList();
         collection.removeIf(flat -> flat.getFurnish() == furnish && flat.getOwner().getUsername().equals(username));
-        return n;
+        return ids;
     }
 
     public List<Flat> filterByName(String name) {

@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import se.ifmo.lab08.client.controller.MainFormController;
 import se.ifmo.lab08.common.entity.Flat;
 import se.ifmo.lab08.common.entity.Transport;
 import se.ifmo.lab08.common.entity.View;
@@ -28,8 +29,8 @@ public class TableColumnsInitializer {
         TableColumn<Flat, Float> coordinateYColumn = new FixedNameTableColumn<>(FlatColumnNames.COORDINATES_Y_COLUMN);
         coordinateYColumn.setCellValueFactory(cellValue -> new SimpleFloatProperty(cellValue.getValue().getCoordinates().getY()).asObject());
         TableColumn<Flat, String> creationDateColumn = new FixedNameTableColumn<>(FlatColumnNames.CREATION_DATE_COLUMN);
-//        creationDateColumn.setCellValueFactory(cellValue -> new SimpleObjectProperty<>(cellValue.getValue().getCreatedAt().withZoneSameInstant(MainFormController.getCurrentLocale().get().getZoneID()).format(MainFormController.getCurrentLocale().get().getDateTimeFormatter())));
-        creationDateColumn.setCellValueFactory(cellValue -> new SimpleObjectProperty<>(cellValue.getValue().getCreatedAt().toString()));
+        creationDateColumn.setCellValueFactory(cellValue -> new SimpleObjectProperty<>(cellValue.getValue().getCreatedAt().withZoneSameInstant(MainFormController.getCurrentLocale().get().getZoneID()).format(MainFormController.getCurrentLocale().get().getDateTimeFormatter())));
+//        creationDateColumn.setCellValueFactory(cellValue -> new SimpleObjectProperty<>(cellValue.getValue().getCreatedAt().toString()));
         TableColumn<Flat, Long> areaColumn = new FixedNameTableColumn<>(FlatColumnNames.AREA_COLUMN);
         areaColumn.setCellValueFactory(new PropertyValueFactory<>("area"));
         TableColumn<Flat, Long> numberOfRoomsColumn = new FixedNameTableColumn<>(FlatColumnNames.NUMBER_OF_ROOMS);
@@ -46,12 +47,11 @@ public class TableColumnsInitializer {
         houseYearColumn.setCellValueFactory(cellValue -> new SimpleLongProperty(cellValue.getValue().getHouse().getYear()).asObject());
         TableColumn<Flat, Integer> houseNumberOfFlatsColumn = new FixedNameTableColumn<>(FlatColumnNames.HOUSE_NUMBER_OF_FLATS_COLUMN);
         houseNumberOfFlatsColumn.setCellValueFactory(cellValue -> new SimpleIntegerProperty(cellValue.getValue().getHouse().getNumberOfFlatsOnFloor()).asObject());
-
-//        TableColumn<Flat, Integer> ownerIdColumn = new FixedNameTableColumn<>(ColumnNames.OWNER_ID_COLUMN);
-//        ownerIdColumn.setCellValueFactory(cellValue -> new SimpleIntegerProperty(cellValue.getValue().getOwner().getId()).asObject());
+        TableColumn<Flat, String> ownerUsernameColumn = new FixedNameTableColumn<>(FlatColumnNames.OWNER_USERNAME_COLUMN);
+        ownerUsernameColumn.setCellValueFactory(cellValue -> new SimpleObjectProperty<>(cellValue.getValue().getOwner().getUsername()));
 
         tableView.getColumns().setAll(idColumn, nameColumn, coordinateXColumn, coordinateYColumn, creationDateColumn,
-                areaColumn, numberOfRoomsColumn, furnishColumn, viewColumn, transportColumn, houseNameColumn, houseYearColumn, houseNumberOfFlatsColumn);
+                areaColumn, numberOfRoomsColumn, furnishColumn, viewColumn, transportColumn, houseNameColumn, houseYearColumn, houseNumberOfFlatsColumn, ownerUsernameColumn);
     }
 
 }
